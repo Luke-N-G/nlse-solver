@@ -67,6 +67,7 @@ def plotinst(sim:Sim, fib:Fibra, AT, AW, Tlim=None, Wlim=None, Ylim=None, wavele
     if dB:
         ax1.set_yscale("log")
         ax2.set_yscale("log")
+    plt.tight_layout()
     if save:
         plt.savefig(save, dpi=800)        
     if noshow:
