@@ -4,13 +4,12 @@ Created on Fri Jun 30 10:43:33 2023
 
 @author: d/dt Lucas
 """
-
+#Comentario
 
 import numpy as np
 from solvers.solvegnlse import SolveNLS
-from common.commonfunc import SuperGauss, Soliton, Sim, Fibra, Pot, fftshift, FT, IFT, find_shift, find_chirp
-from common.plotter import plotinst, plotevol, plotcmap, plotenergia, plotfotones, plt
-from scipy.signal import find_peaks
+from common.commonfunc import SuperGauss, Soliton, Sim, Fibra, Pot, fftshift, FT, IFT
+from common.plotter import plotinst, plotcmap, plt
 
 
 #Parametros para la simulación
@@ -30,11 +29,11 @@ gam   = 1.4e-3                    #Gamma:  1/Wm
 gam1  = gam/omega0*0              #Gamma1: 0
 alph  = 0                         #alpha:  1/m
 TR    = 3e-3*0                    #TR:     fs
-fR    = 0.18*0                    #fR:     adimensional (0.18)
+fR    = 0.18*1                    #fR:     adimensional (0.18)
 
 #Parámetros pulso gaussiano:
 amp    = 1                 #Amplitud:  sqrt(W), Po = amp**2
-ancho  = 1                  #Ancho T0:  ps
+ancho  = .4                  #Ancho T0:  ps
 offset = 0                  #Offset:    ps
 chirp  = 0                  #Chirp:     1/m
 orden  = 1                  #Orden
@@ -49,12 +48,12 @@ fibra = Fibra(L, b2, b3, gam, gam1, alph, lambda0, TR, fR)
 pulso = SuperGauss(sim.tiempo, amp, ancho, offset, chirp, orden)
 
 #Solitón
-soliton = Soliton(sim.tiempo, ancho, fibra.beta2, fibra.gamma, orden = 2)
+soliton = Soliton(sim.tiempo, ancho, fibra.beta2, fibra.gamma, orden = 1)
 
 
 #%% Corriendo la simulación
 
-zlocs, AW, AT = SolveNLS(sim, fibra, soliton, raman=False, z_locs=100)
+zlocs, AW, AT = SolveNLS(sim, fibra, soliton, raman=True, z_locs=100)
 
 
 #%% Plotting
