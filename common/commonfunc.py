@@ -48,7 +48,6 @@ def Two_Pulse(T, amp1, amp2, ancho1, ancho2, offset1, offset2, nu, pulses):
     if pulses not in pulse_dict:
         raise ValueError(f"Tipo de pulso no valido: {pulses}. Los tipos son: 's', 'p', 'sp'.")
 
-
     return pulse_dict.get(pulses)
 
 #Función que calcula la potencia

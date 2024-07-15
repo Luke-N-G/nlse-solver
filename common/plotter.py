@@ -293,9 +293,11 @@ cmap:          String, se elije el colormap. Por default es Turbo  (opcional)
 nowshow:       Boolean, si "True" no muestra el gráfico            (opcional)
 dpi:           Int, ajusta la resolución de la imagen final        (opcional)
 '''
-def plotspecgram(sim:Sim, fib:Fibra, AT, Tlim=None, Wlim=None, save=None, dB=None, zeros=None, cmap="turbo", noshow=None, dpi=800):
-    plt.figure()
+def plotspecgram(sim:Sim, fib:Fibra, AT, Tlim=None, Wlim=None, end=-1, save=None, dB=None, zeros=None, cmap="turbo", noshow=None, dpi=800):
     
+    AT = AT[end,:]
+    
+    plt.figure()    
     #x-axis limits
     xextent = [sim.tiempo[0], sim.tiempo[-1]]
     #Time span
