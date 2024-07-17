@@ -51,7 +51,7 @@ offset_2 = 20
 
 
 #Parametros para la fibra
-L     = 500*0.01                   #Lfib:   m
+L     = 500                   #Lfib:   m
 b2    = -4.4e-3*1                  #Beta2:  ps^2/km
 b3    = 0.13e-3*1                  #Beta3:  ps^3/km
 gam   = 2.5e-3*1                   #Gamma:  1/Wkm
@@ -100,7 +100,7 @@ plotinst(sim, fibra, AT, AW, dB=False , wavelength=True, zeros=True, end=-1)
 
 plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 
-plotspecgram(sim, fibra, AT[0], zeros=True)
+plotspecgram(sim, fibra, AT, zeros=True)
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
           vlims=[-20,50,0,120], zeros=True)
@@ -120,4 +120,23 @@ plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wli
 #------- NO OLVIDARSE DE CAMBIAR LOS OTROS PARAMETROS! -------
 #saver(AW,AT,sim,fibra,savedic+str(j), f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
 
+#Po = 10W, To = 2.1ps, lambda_i = 1500 nm
+# =============================================================================
+# reflect_wave_t = [1525.95643739, 1528.68813412, 1530.99614865, 1535.59401619,
+#        1537.67139725, 1538.91257145, 1538.91257145, 1540.35459015,
+#        1540.97034682, 1541.38002821, 1541.38002821, 1542.40112176,
+#        1542.60477423, 1543.41735052]
+# 
+# z_s = [267.2,280.6,294.8,309.8,322.5,338.2,352.4,368.1,390.5,
+#        408.4,433.1,456.3,472.0,492.2]
+# =============================================================================
 
+reflect_wave_t = [1527.63785688, 1531.41528825, 1535.38575916, 1542.19727487,
+       1546.03250148, 1548.01155099, 1551.66612959, 1555.30091614,
+       1559.21611957, 1561.90664954]
+
+z_s = [233,239,242.5,248.9,256.2,268.2,277.2,289.2,302.9,315.8]
+
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=False, Tlim=[-30,30], Wlim=[1400,1700],zeros=True)
+          #vlims=[-20,50,0,120], zeros=True)
+plt.plot(reflect_wave_t,z_s, color="white")

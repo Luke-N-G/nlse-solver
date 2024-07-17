@@ -117,7 +117,7 @@ plt.grid(True,alpha=.3)
 plt.tight_layout()
 plt.show()
 
-#%% Recoil dW test
+#%% Recoil dW test (Pickartz)
 
 w_i = 2*np.pi*c/Lambda2 - omega0 #Freq. de onda incidente
 dw_s = 3.8#3.1#6 #Delta W del solitón a la salida del choque
@@ -136,13 +136,46 @@ def find_reflection(fib:Fibra, lambda_i, lambda_s):
     c_coef  = -fib.beta3/6 * w_i**3 - fib.beta2/2 * w_i**2 + shift_c * w_i
     coefs   = [fib.beta3/6, fib.beta2/2, -shift_c, c_coef]
     raices  = np.roots(coefs)
-    print(omega_to_lambda(raices,omega0))
+    #print(omega_to_lambda(raices,omega0))
+    return omega_to_lambda(raices, fib.omega0)
+
+#Función para hallar lambda soliton en función del reflejado(Adiabatic theory...)
+def find_solitonlambda(fib:Fibra, lambda_i, lambda_s): 
+    w_i     = 2*np.pi*c/lambda_i - fib.omega0
+    dw_s    = 2*np.pi*c/lambda_s - 2*np.pi*c/fib.lambda0
+    shift_c = fib.beta2 * dw_s + fib.beta3 * dw_s**2
+    c_coef  = -fib.beta3/6 * w_i**3 - fib.beta2/2 * w_i**2 + shift_c * w_i
+    coefs   = [fib.beta3/6, fib.beta2/2, -shift_c, c_coef]
+    raices  = np.roots(coefs)
+    #print(omega_to_lambda(raices,omega0))
     return omega_to_lambda(raices, fib.omega0)
     
 
 raices = np.roots(coefs)
 print(raices)
 print(omega_to_lambda(raices,omega0))
+
+
+#Caso lambda_i=1500, corrimiento en lambda del soliton en función de z:
+#Po=10W, To=2.1ps
+z_s1 = [267.2,280.6,294.8,309.8,322.5,338.2,352.4,368.1,390.5,
+       408.4,433.1,456.3,472.0,492.2]
+
+lambda_sol1 = [1600.9,1599.6,1598.5,1596.3,1595.3,1594.7,1594.7,
+              1594,1593.7,1593.5,1593.5,1593,1592.9,1592.5]
+
+reflect_wave1 = np.zeros_like(lambda_sol1)
+for i in range( len(lambda_sol1) ):    
+    reflect_wave1[i] = find_reflection(fibra_r, 1500, lambda_sol1[i])[1]
+
+#Po=20W, To=3ps
+z_s2 = [233,239,242.5,248.9,256.2,268.2,277.2,289.2,302.9,315.8]
+
+lambda_sol2= [1600.1,1598.3,1596.4,1593.1,1591.2,1590.2,1588.3,1586.3,1583.9,1581.9]
+
+reflect_wave2 = np.zeros_like(lambda_sol2)
+for i in range( len(lambda_sol2) ):    
+    reflect_wave2[i] = find_reflection(fibra_r, 1500, lambda_sol2[i])[1]
 
 #%%
 
