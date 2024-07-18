@@ -139,13 +139,14 @@ def find_reflection(fib:Fibra, lambda_i, lambda_s):
     #print(omega_to_lambda(raices,omega0))
     return omega_to_lambda(raices, fib.omega0)
 
-#Función para hallar lambda soliton en función del reflejado(Adiabatic theory...)
-def find_solitonlambda(fib:Fibra, lambda_i, lambda_s): 
+#Función para hallar lambda soliton en función del reflejado (Adiabatic theory...)
+def find_solitonlambda(fib:Fibra, lambda_i, lambda_r): 
     w_i     = 2*np.pi*c/lambda_i - fib.omega0
-    dw_s    = 2*np.pi*c/lambda_s - 2*np.pi*c/fib.lambda0
-    shift_c = fib.beta2 * dw_s + fib.beta3 * dw_s**2
-    c_coef  = -fib.beta3/6 * w_i**3 - fib.beta2/2 * w_i**2 + shift_c * w_i
-    coefs   = [fib.beta3/6, fib.beta2/2, -shift_c, c_coef]
+    w_r    = 2*np.pi*c/lambda_r - 2*np.pi*c/fib.lambda0
+    a_coef = (w_r - w_i)*fib.beta3/2
+    b_coef = (w_r - w_i)*fib.beta2
+    c_coef = fib.beta2/2 * w_i**2 + fib.beta3/6 * w_i**3 - fib.beta2/2 * w_r**2 - fib.beta3/6 * w_r**3
+    coefs   = [a_coef, b_coef, c_coef]
     raices  = np.roots(coefs)
     #print(omega_to_lambda(raices,omega0))
     return omega_to_lambda(raices, fib.omega0)
@@ -176,6 +177,15 @@ lambda_sol2= [1600.1,1598.3,1596.4,1593.1,1591.2,1590.2,1588.3,1586.3,1583.9,158
 reflect_wave2 = np.zeros_like(lambda_sol2)
 for i in range( len(lambda_sol2) ):    
     reflect_wave2[i] = find_reflection(fibra_r, 1500, lambda_sol2[i])[1]
+    
+#Lambda soliton en función de lambda reflejado: Po = 10W, To = 2.1 ps
+z_s3 = [286.3,304.4,323.6,344.4,374.4,425.6,494.9]
+
+lambda_ref = [1531.75,1531.94,1532.89,1534.03,1535.17,1535.45,1535.55]
+
+soliton_wave1 = np.zeros_like(lambda_ref)
+for i in range( len(lambda_ref) ):
+    soliton_wave1[i] = find_solitonlambda(fibra_r, 1500, lambda_ref[i])[1]
 
 #%%
 
