@@ -146,6 +146,30 @@ class Fibra:
         else:
             self.w_znw = None
             self.znw   = None
+    
+    #---Algunos métodos útiles---
+    #Método para pasar de omega a lambda
+    def omega_to_lambda(self, w):  #Función para pasar de Omega a lambda.
+        return 2*np.pi* 299792458 * (1e9)/(1e12)/(self.omega0+w)
+    def lambda_to_omega(self,lam): #Función para pasar de lambda a Omega.
+        return 2*np.pi*299792458 * (1e9)/(1e12) * (1/lam - 1/self.lambda0)
+    #Método para calcular gamma en función de omega
+    def gamma_w(self, w, wavelength=False):
+        if wavelength:
+            w = self.lambda_to_omega(w)
+        return self.gamma + self.gamma1 * w
+    #Método para calcular beta2 en función de omega
+    def beta2_w(self, w, wavelength=False):
+        if wavelength:
+            w = self.lambda_to_omega(w)
+        if self.betas != 0:
+            beta2 = 0
+            for i, beta in enumerate(self.betas):
+                beta2 += beta * w**i / np.math.factorial(i)
+        else:
+            beta2 = self.beta2 + self.beta3 * w
+        return beta2
+
 
 #Ver como meter esto en la clase Fibra directamente.
 def beta2w(freq, fib:Fibra):
