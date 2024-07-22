@@ -6,3 +6,4 @@ common/__pycache__/commonfunc.cpython-310.pyc
 common/__pycache__/plotter.cpython-310.pyc
 solvers/__pycache__/__init__.cpython-310.pyc
 solvers/__pycache__/solvegnlse.cpython-310.pyc
+run_sensor.py
