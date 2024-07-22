@@ -16,9 +16,8 @@ Requiere: z y B libres, operador lineal D, frecuencia w, gamma y TR'''
 def dBdz(z,B,D,w,gamma,TR): #Todo lo que esta del lado derecho de dB/dz = ..., en el espacio de frecuencias.
     A_w = B * np.exp(D*z)
     A_t = IFT( A_w )
-    return np.exp(-D*z) * FT(
-        1j*gamma * Pot( A_t ) * A_t -  #i gamma |A|^2 A
-    1j*gamma*TR * IFT( -1j*w* FT( Pot(A_t) ) ) * A_t  ) #i gamma TR d/dt(|A|^2) A
+    op_nolin = FT( 1j*gamma*Pot(A_t)*A_t - 1j*gamma*TR*IFT( -1j*w*FT(Pot(A_t)) )*A_t)
+    return np.exp(-D*z) * op_nolin
 
 def dBdz_raman(z,B,D,w,gamma,gamma1,RW): #RW es la respuesta Raman en frecuencia (lo que calcula la función Raman(T))
     A_w = B * np.exp(D*z)
