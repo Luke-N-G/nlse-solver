@@ -155,9 +155,9 @@ def find_solitonlambda(fib:Fibra, lambda_i, lambda_r):
 def find_reflection_test(fib:Fibra, lambda_i, lambda_s, Pi, Po): 
     w_i     = 2*np.pi*c/lambda_i - fib.omega0
     dw_s    = 2*np.pi*c/lambda_s - 2*np.pi*c/fib.lambda0
-    shift_c = fib.beta2 * dw_s + fib.beta3 * dw_s**2 + fib.gamma1 * Po
+    shift_c = fib.beta2 * dw_s + fib.beta3 * dw_s**2 #+ fib.gamma1 * Po
     c_coef  = -fib.beta3/6 * w_i**3 - fib.beta2/2 * w_i**2 + shift_c * w_i + fib.gamma * Po - fib.gamma_w(w_i) * Pi
-    coefs   = [fib.beta3/6, fib.beta2/2, -shift_c, c_coef]
+    coefs   = [fib.beta3/6, fib.beta2/2, -shift_c-fib.gamma1*Po, c_coef]
     raices  = np.roots(coefs)
     return omega_to_lambda(raices, fib.omega0)
     
