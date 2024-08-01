@@ -168,7 +168,14 @@ def format_func(value, tick_number):
 
 def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
              legacy=False, vlims=[], cmap="turbo", Tlim=None, Wlim=None,
-             zeros=False, save=None, noshow=False):
+             zeros=False, save=None, noshow=False, plot_type="both"):
+
+    #Labels y tamaños
+    cbar_tick_size = 7
+    tick_size      = 10
+    m_label_size   = 12
+    M_label_size   = 15
+
     
     #Adaptamos los vectores viejos a matrices, de ser necesario
     if legacy:
@@ -212,66 +219,66 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
     else:
         vmin_t = vmax_t = vmin_w = vmax_w = None
     #Ploteamos
-    fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=(8.76,5))
+    if plot_type == 'both':
+        fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=(8.76,5))
+    elif plot_type == 'time':
+        fig, ax1 = plt.subplots(1,1,figsize=(8.76,5))
+    elif plot_type == 'freq':
+        fig, ax2 = plt.subplots(1,1,figsize=(8.76,5))
+    else:
+        raise ValueError(f"Invalid plot type: {plot_type}. Valid types are: 'time', 'freq', 'both'.")
+
+    #fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=(8.76,5))
     
     #---Plot en tiempo---
-    #Imshow 1
-    im1 = ax1.imshow(P_T, cmap=cmap, aspect="auto", interpolation='bilinear', origin="lower",
-                     extent=textent, vmin=vmin_t, vmax=vmax_t)
-    #Colorbar 1: Es interactivo
-    cbar1 = fig.colorbar(im1, ax=ax1, label='$|A|^2$', location="bottom", aspect=50 )
-    if dB: #Si dB == True, ajustamos los ticks al formato 10^x (interactuar con esto lo rompe)
-        cbar1.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
+    if plot_type in ['time', 'both']:
+        #Imshow 1
+        im1 = ax1.imshow(P_T, cmap=cmap, aspect="auto", interpolation='bilinear', origin="lower",
+                         extent=textent, vmin=vmin_t, vmax=vmax_t)
+        ax1.tick_params(labelsize=tick_size)
+        ax1.set_ylabel("Distance (m)", size=m_label_size)
+        ax1.set_xlabel("Time (ps)", size=m_label_size)
+        ax1.set_title("Pulse", size=M_label_size)
+        #Colorbar 1: Es interactivo
+        cbar1 = fig.colorbar(im1, ax=ax1, label='$|A|^2$', location="bottom", aspect=50 )
+        cbar1.ax.tick_params(labelsize=cbar_tick_size)
+        if dB: #Si dB == True, ajustamos los ticks al formato 10^x (interactuar con esto lo rompe)
+            cbar1.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
+        if Tlim:
+            ax1.set_xlim(Tlim)        
         
     #---Plot en espectro---
-    #Imshow 2
-    im2 = ax2.imshow(P_W, cmap=cmap, aspect="auto", interpolation='bilinear', origin="lower",
-                     extent=wextent, vmin=vmin_w, vmax=vmax_w)
-    #Colorbar 2
-    cbar2 = fig.colorbar(im2, ax=ax2, label='$|\\tilde{A}|^2$', location="bottom", aspect=50 )
-    if dB:
-        cbar2.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
-        
-    if zeros:
-        freq_zdw = (fib.omega0 - fib.w_zdw)/(2*np.pi)
-        freq_znw = (fib.omega0 - fib.w_znw)/(2*np.pi)
-        if wavelength:
-            ax2.axvline(x = fib.zdw, linestyle="--", color="white",  label="ZDW")
-            ax2.axvline(x = fib.znw, linestyle="--", color="crimson", label="ZNW")
-        else:
-            ax2.axvline(x = freq_zdw, linestyle="--", label="ZDW")
-            ax2.axvline(x = freq_znw, linestyle="--", label="ZNW")
+    if plot_type in ['freq', 'both']:
+        #Imshow 2
+        im2 = ax2.imshow(P_W, cmap=cmap, aspect="auto", interpolation='bilinear', origin="lower",
+                         extent=wextent, vmin=vmin_w, vmax=vmax_w)
+        ax2.tick_params(labelsize=tick_size)
+        ax2.set_title("Spectrum", size=M_label_size)
+        #Colorbar 2
+        cbar2 = fig.colorbar(im2, ax=ax2, label='$|\\tilde{A}|^2$', location="bottom", aspect=50 )
+        cbar2.ax.tick_params(labelsize=cbar_tick_size)
+        if dB:
+            cbar2.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
             
-        
-    #---Labels y limites---
-    
-    #Labels y tamaños
-    cbar_tick_size = 7
-    tick_size      = 10
-    m_label_size   = 12
-    M_label_size   = 15
-    cbar1.ax.tick_params(labelsize=cbar_tick_size)
-    cbar2.ax.tick_params(labelsize=cbar_tick_size)
-    ax1.tick_params(labelsize=tick_size)
-    ax2.tick_params(labelsize=tick_size)
-    
-    if Tlim:
-        ax1.set_xlim(Tlim)
-    if Wlim:
-        ax2.set_xlim(Wlim)
-    if wavelength:
-        ax2.set_xlabel("Wavelength (nm)", size=m_label_size)
-    else:
-        ax2.set_xlabel("Frequency (THz)", size=m_label_size)
-    ax1.set_ylabel("Distance (m)", size=m_label_size)
-    ax1.set_xlabel("Time (ps)", size=m_label_size)
-    ax1.set_title("Pulse", size=M_label_size)
-    ax2.set_title("Spectrum", size=M_label_size)  
+        if zeros:
+            freq_zdw = (fib.omega0 - fib.w_zdw)/(2*np.pi)
+            freq_znw = (fib.omega0 - fib.w_znw)/(2*np.pi)
+            if wavelength:
+                ax2.axvline(x = fib.zdw, linestyle="--", color="white",  label="ZDW")
+                ax2.axvline(x = fib.znw, linestyle="--", color="crimson", label="ZNW")
+            else:
+                ax2.axvline(x = freq_zdw, linestyle="--", label="ZDW")
+                ax2.axvline(x = freq_znw, linestyle="--", label="ZNW")
+            plt.legend(loc="best")
+        if Wlim:
+            ax2.set_xlim(Wlim)
+        if wavelength:
+            ax2.set_xlabel("Wavelength (nm)", size=m_label_size)
+        else:
+            ax2.set_xlabel("Frequency (THz)", size=m_label_size)
     
     plt.tight_layout()
     
-    if zeros:
-        plt.legend(loc="best")
     if save:
         plt.savefig(save, dpi=800)
     if noshow:

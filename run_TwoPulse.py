@@ -45,8 +45,8 @@ offset_1 = 0
 
 #Parámetros pulso 2:
 Lambda2  = 1500#1480
-amp_2    = 10#30*1
-ancho_2  = 2100e-3
+amp_2    = 20#30*1
+ancho_2  = 3000e-3#2100e-3
 offset_2 = 20 
 
 
@@ -103,10 +103,69 @@ plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 plotspecgram(sim, fibra, AT, zeros=True)
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
-          vlims=[-20,50,0,120], zeros=True)
+          vlims=[-20,50,0,120], zeros=True,plot_type="both")
+
+#%% Extra1
+
+#Buscar posición y tiempo del máximo en AT^2
+def find_max(AT, tiempo):
+    # Calculate the absolute square of AT
+    AT_abs_square = np.abs(AT)**2
+
+    # Find the index of the maximum value for each position
+    max_time_indices = np.argmax(AT_abs_square, axis=1)
+
+    # Get the actual time values
+    max_times = tiempo[max_time_indices]
+
+    return max_times
+
+#Ajuste con un spline polinómico
+from scipy.interpolate import UnivariateSpline
+def compute_derivative(max_times, zlocs):
+    # Fit a spline to the data
+    spline = UnivariateSpline(zlocs, max_times, k=3)  # k=3 for cubic spline
+    spline.set_smoothing_factor(0.5)
+    # Compute the derivative of the spline
+    derivative = spline.derivative()
+    # Evaluate the derivative at each position
+    derivative_values = derivative(zlocs)
+    return derivative_values
+
+maxs = find_max(AT, sim.tiempo)
+vgs  = compute_derivative(maxs, zlocs)
 
 
-#%% Extra
+def omega_to_lambda(w, w0): #Función para pasar de Omega a lambda.
+    return 2*np.pi*c/(w0+w)
+
+#Reflexión con beta1 del solitón manual (encontrado con la trayectoria de la simulación)
+def find_reflection_manual(fib:Fibra, lambda_i, beta1_s): 
+    w_i     = 2*np.pi*c/lambda_i - fib.omega0
+    #dw_s    = 2*np.pi*c/lambda_s - 2*np.pi*c/fib.lambda0
+    shift_c = beta1_s
+    c_coef  = -fib.beta3/6 * w_i**3 - fib.beta2/2 * w_i**2 + shift_c * w_i
+    coefs   = [fib.beta3/6, fib.beta2/2, -shift_c, c_coef]
+    raices  = np.roots(coefs)
+    #print(omega_to_lambda(raices,omega0))
+    return omega_to_lambda(raices, fib.omega0)
+
+reflection = np.zeros_like(zlocs)
+for i in range(len(zlocs)):
+    reflection[i] = find_reflection_manual(fibra, 1500, vgs[i])[1]
+
+
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
+          vlims=[-20,50,0,120], zeros=True, plot_type="time")
+plt.plot(maxs, zlocs, "--w")
+plt.show()
+
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
+          vlims=[-20,50,0,120], zeros=True, plot_type="freq")
+plt.plot(reflection, zlocs, "--b")
+plt.show()
+
+#%% Extra2
 
 
 #Para guardar en loop con i el parametro variado
