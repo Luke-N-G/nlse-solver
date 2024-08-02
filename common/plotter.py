@@ -222,9 +222,9 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
     if plot_type == 'both':
         fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=(8.76,5))
     elif plot_type == 'time':
-        fig, ax1 = plt.subplots(1,1,figsize=(8.76,5))
+        fig, ax1 = plt.subplots(1,1,figsize=(6.5,5))
     elif plot_type == 'freq':
-        fig, ax2 = plt.subplots(1,1,figsize=(8.76,5))
+        fig, ax2 = plt.subplots(1,1,figsize=(6.5,5))
     else:
         raise ValueError(f"Invalid plot type: {plot_type}. Valid types are: 'time', 'freq', 'both'.")
 

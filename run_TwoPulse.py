@@ -45,8 +45,8 @@ offset_1 = 0
 
 #Parámetros pulso 2:
 Lambda2  = 1500#1480
-amp_2    = 20#30*1
-ancho_2  = 3000e-3#2100e-3
+amp_2    = 10#20#30*1
+ancho_2  = 2100e-3
 offset_2 = 20 
 
 
