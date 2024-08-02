@@ -122,18 +122,32 @@ def find_max(AT, tiempo):
 
 #Ajuste con un spline polinómico
 from scipy.interpolate import UnivariateSpline
+from scipy.signal import savgol_filter
 def compute_derivative(max_times, zlocs):
     # Fit a spline to the data
     spline = UnivariateSpline(zlocs, max_times, k=3)  # k=3 for cubic spline
-    spline.set_smoothing_factor(0.5)
+    spline.set_smoothing_factor(1)
     # Compute the derivative of the spline
     derivative = spline.derivative()
     # Evaluate the derivative at each position
     derivative_values = derivative(zlocs)
     return derivative_values
 
+def compute_derivative_zd(max_times, zlocs, window_length, polyorder):
+    # Apply Savitzky-Golay filter to the data
+    smoothed_max_times = savgol_filter(max_times, window_length, polyorder)
+    # Compute the differences between consecutive times and positions
+    dt = np.diff(smoothed_max_times)
+    dz = np.diff(zlocs)
+    # Compute the derivative as the ratio of differences
+    derivative_values = dt / dz
+    return derivative_values
+
+
+
 maxs = find_max(AT, sim.tiempo)
 vgs  = compute_derivative(maxs, zlocs)
+vgs_zd = compute_derivative_zd(maxs, zlocs, 3, 2)
 
 
 def omega_to_lambda(w, w0): #Función para pasar de Omega a lambda.
@@ -151,13 +165,19 @@ def find_reflection_manual(fib:Fibra, lambda_i, beta1_s):
     return omega_to_lambda(raices, fib.omega0)
 
 reflection = np.zeros_like(zlocs)
+reflection_zd = np.zeros_like(zlocs)
 for i in range(len(zlocs)):
     reflection[i] = find_reflection_manual(fibra, 1500, vgs[i])[1]
+    reflection_zd[i] = find_reflection_manual(fibra, 1500, vgs_zd[i])[1]
+
+spl = UnivariateSpline(zlocs,maxs, k =3)
+spl.set_smoothing_factor(0.02)
 
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
           vlims=[-20,50,0,120], zeros=True, plot_type="time")
-plt.plot(maxs, zlocs, "--w")
+#plt.plot(maxs, zlocs, "--w")
+plt.plot(spl(zlocs), zlocs, "--w")
 plt.show()
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
