@@ -8,9 +8,10 @@ Created on Tue Jan 23 14:14:05 2024
 import numpy as np
 import matplotlib.pyplot as plt
 import pyqtgraph as pg
-from commonfunc import Energia, num_fotones, saver, loader, ReSim, FT, IFT, fftshift, Pot, Fibra, Adapt_Vector
-from plotter import plotenergia, plotevol, plotinst, plotspecgram, plot_time, plotcmap
+from common.commonfunc import Energia, num_fotones, saver, loader, ReSim, FT, IFT, fftshift, Pot, Fibra, Adapt_Vector
+from common.plotter import plotenergia, plotevol, plotinst, plotspecgram, plot_time, plotcmap
 from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
 import cmasher as cmr
 
 AW, AT, sim, fibra = loader("soliton_gen/sg1", resim = True)
@@ -19,13 +20,56 @@ zlocs = np.linspace(0, 300, len(AT))
 #%%
 
 plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,
-         vlims=[-20,50,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True,
-         save="test.svg")
+         vlims=[-20,50,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
 
 plotinst(sim, fibra, AT, AW, wavelength=True)
 
-plotevol(sim, fibra, zlocs, AT, AW, Tlim=[-25,25], Wlim=[1400,1700], wavelength=True, dB=False, cmap="turbo")
 
+#%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
+
+
+# Define the sech function
+def sech(x, a, b, c):
+    return a / np.cosh(b * (x - c))
+
+# Function to find solitons
+def find_solitons(AT, AW, threshold, mask_start, mask_end):
+    # Convert mask boundaries to indices
+    mask_start_idx = np.argmin(np.abs(AT[0,:] - mask_start))
+    mask_end_idx = np.argmin(np.abs(AT[0,:] - mask_end))
+
+    # Apply the mask to the spectrum
+    AW_masked = np.zeros_like(AW)
+    AW_masked[:, mask_start_idx:mask_end_idx] = AW[:, mask_start_idx:mask_end_idx]
+
+    # Convert the masked spectrum back to the time domain using your IFT function
+    AT_masked = IFT(AW_masked)
+
+    # Find peaks in the time domain signal
+    peaks, _ = find_peaks(np.abs(AT_masked[-1,:]), height=threshold)
+
+    soliton_count = 0
+
+    # For each peak, fit a sech function to the time domain signal
+    for peak in peaks:
+        # Extract a window around the peak
+        window = AT_masked[-1, peak-10:peak+10]
+
+        # Fit a sech function to the windowed signal
+        popt, pcov = curve_fit(sech, np.arange(len(window)), np.abs(window))
+
+        # Check the quality of the fit
+        residuals = window - sech(np.arange(len(window)), *popt)
+        rss = np.sum(residuals**2)
+
+        # If the fit is good, increment the soliton count
+        if rss < 1e-6:
+            soliton_count += 1
+
+    return soliton_count
+
+
+find_solitons(AT, AW, 100, mask_start, mask_end)
 
 #%% Plots generales
 
