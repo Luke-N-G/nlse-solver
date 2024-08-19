@@ -14,7 +14,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
 
-AW, AT, sim, fibra = loader("soliton_gen/sg1", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
 zlocs = np.linspace(0, 300, len(AT))
 
 #%%
@@ -23,6 +23,28 @@ plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,
          vlims=[-20,50,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
 
 plotinst(sim, fibra, AT, AW, wavelength=True)
+
+#%% Masking Test
+
+lam, AL = Adapt_Vector(sim.freq, fibra.omega0, AW[0])
+
+masklam_start = fibra.zdw
+masklam_end   = fibra.znw
+
+maskw_start = fibra.lambda_to_omega( masklam_start )/(2*np.pi)
+maskw_end = fibra.lambda_to_omega( masklam_end )/(2*np.pi)
+
+mask_start_idx = np.argmin( np.abs(sim.freq - maskw_start)  )
+mask_end_idx = np.argmin( np.abs(sim.freq - maskw_end)  )
+
+#Esto corta al AW entre los índices que cumplan lo de arriba
+AW_cut = AW[0][:mask_start_idx]
+AW_cut = np.append(AW_cut, np.zeros_like(sim.freq[mask_start_idx:mask_end_idx]) )
+AW_cut = np.append(AW_cut, AW[0][mask_end_idx:])
+
+plt.figure()
+plt.plot( fftshift(sim.freq), fftshift(Pot(AW_cut)) )
+plt.show()
 
 
 #%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
