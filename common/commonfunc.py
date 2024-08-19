@@ -218,7 +218,14 @@ def loader(filename, resim = None):
 def ReSim(metadata):
     # Load the saved parameters in metadata to the Sim and Fibra classes, returning sim and fibra objects.
     sim = Sim(**metadata['Sim'])
-    fibra = Fibra(**metadata['Fibra'])
+    
+    # Define the parameters that Fibra class's __init__ method accepts
+    fibra_params = ['L', 'beta2', 'beta3', 'gamma', 'gamma1', 'alpha', 'lambda0', 'TR', 'fR', 'betas']
+    
+    # Filter the metadata to only include the parameters that Fibra class's __init__ method accepts
+    fib_m = {k: v for k, v in metadata['Fibra'].items() if k in fibra_params}
+    
+    fibra = Fibra(**fib_m)
     return sim, fibra
 
 
