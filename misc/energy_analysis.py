@@ -49,7 +49,6 @@ plt.show()
 
 #%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
 
-
 # Define the sech function
 def sech(x, a, b, c):
     return a / np.cosh(b * (x - c))
@@ -57,8 +56,11 @@ def sech(x, a, b, c):
 # Function to find solitons
 def find_solitons(AT, AW, threshold, mask_start, mask_end):
     # Convert mask boundaries to indices
-    mask_start_idx = np.argmin(np.abs(AT[0,:] - mask_start))
-    mask_end_idx = np.argmin(np.abs(AT[0,:] - mask_end))
+    maskw_start = fibra.lambda_to_omega( mask_start )/(2*np.pi)
+    maskw_end = fibra.lambda_to_omega( mask_end )/(2*np.pi)
+    
+    mask_start_idx = np.argmin( np.abs(sim.freq - maskw_start)  )
+    mask_end_idx = np.argmin( np.abs(sim.freq - maskw_end)  )
 
     # Apply the mask to the spectrum
     AW_masked = np.zeros_like(AW)
@@ -90,8 +92,8 @@ def find_solitons(AT, AW, threshold, mask_start, mask_end):
 
     return soliton_count
 
-
-find_solitons(AT, AW, 100, mask_start, mask_end)
+#Solucionar la función de arriba
+#find_solitons(AT, AW, 100, mask_start, mask_end)
 
 #%% Plots generales
 
