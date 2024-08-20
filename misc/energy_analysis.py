@@ -7,19 +7,20 @@ Created on Tue Jan 23 14:14:05 2024
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pyqtgraph as pg
-from common.commonfunc import Energia, num_fotones, saver, loader, ReSim, FT, IFT, fftshift, Pot, Fibra, Adapt_Vector
+from common.commonfunc import Energia, num_fotones, saver, loader, ReSim, FT, IFT, fftshift, Pot, Fibra, Adapt_Vector, Sim
 from common.plotter import plotenergia, plotevol, plotinst, plotspecgram, plot_time, plotcmap
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
 
 AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
+AW = np.stack(AW)
+AT = np.stack(AT)
 zlocs = np.linspace(0, 300, len(AT))
 
 #%%
 
-plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,
+plotcmap(sim, fibra, zlocs, AT, AW, legacy=False, dB=True, wavelength=True,
          vlims=[-20,50,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
 
 plotinst(sim, fibra, AT, AW, wavelength=True)
@@ -38,59 +39,92 @@ mask_start_idx = np.argmin( np.abs(sim.freq - maskw_start)  )
 mask_end_idx = np.argmin( np.abs(sim.freq - maskw_end)  )
 
 #Esto corta al AW entre los índices que cumplan lo de arriba
-AW_cut = AW[0][:mask_start_idx]
+AW_cut = AW[-1][:mask_start_idx]
 AW_cut = np.append(AW_cut, np.zeros_like(sim.freq[mask_start_idx:mask_end_idx]) )
-AW_cut = np.append(AW_cut, AW[0][mask_end_idx:])
+AW_cut = np.append(AW_cut, AW[-1][mask_end_idx:])
 
 plt.figure()
 plt.plot( fftshift(sim.freq), fftshift(Pot(AW_cut)) )
 plt.show()
 
+plt.figure()
+plt.plot( sim.tiempo, Pot(IFT(AW_cut)))
+plt.plot( sim.tiempo, Pot(IFT(AW[-1])))
+plt.show()
+
+
+peaks, _ = find_peaks( Pot(IFT(AW_cut)), prominence = 10)
+
+plt.figure()
+plt.plot(sim.tiempo, Pot(IFT(AW_cut)))
+plt.plot(sim.tiempo[peaks], Pot(IFT(AW_cut))[peaks], "x")
+plt.show()
 
 #%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
 
-# Define the sech function
-def sech(x, a, b, c):
-    return a / np.cosh(b * (x - c))
+def soliton_fit(T, amplitude, center, width, offset):
+    carrier = np.sqrt(amplitude)*( 1/np.cosh( (T - center)/width) ) + offset
+    return np.abs( carrier )**2
 
-# Function to find solitons
-def find_solitons(AT, AW, threshold, mask_start, mask_end):
-    # Convert mask boundaries to indices
-    maskw_start = fibra.lambda_to_omega( mask_start )/(2*np.pi)
-    maskw_end = fibra.lambda_to_omega( mask_end )/(2*np.pi)
+
+def soliton_number(fib:Fibra, sim:Sim, AW):
     
-    mask_start_idx = np.argmin( np.abs(sim.freq - maskw_start)  )
-    mask_end_idx = np.argmin( np.abs(sim.freq - maskw_end)  )
-
-    # Apply the mask to the spectrum
-    AW_masked = np.zeros_like(AW)
-    AW_masked[:, mask_start_idx:mask_end_idx] = AW[:, mask_start_idx:mask_end_idx]
-
-    # Convert the masked spectrum back to the time domain using your IFT function
-    AT_masked = IFT(AW_masked)
-
-    # Find peaks in the time domain signal
-    peaks, _ = find_peaks(np.abs(AT_masked[-1,:]), height=threshold)
-
+    prominence  = 10  #Prominencia, para hallar picos
+    window_size = 40  #Número de puntos alrededor de cada pico
+    
+    #Buscamos freq. donde enmascarar
+    mask_i     = fibra.lambda_to_omega( fibra.zdw )/(2*np.pi)
+    mask_f     = fibra.lambda_to_omega( fibra.znw )/(2*np.pi)
+    
+    #Buscamos los índices donde enmascarar
+    mask_i_idx = np.argmin( np.abs(sim.freq - mask_i) )
+    mask_f_idx = np.argmin( np.abs(sim.freq - mask_f) )
+    
+    #Enmascaramos, teniendo en cuenta de que el array AW esta shifteado
+    AW_mask = AW[-1][:mask_i_idx]
+    AW_mask = np.append(AW_mask, np.zeros_like(sim.freq[mask_i_idx:mask_f_idx]) )
+    AW_mask = np.append(AW_mask, AW[-1][mask_f_idx:])
+    
+    #Vamos a dominio del tiempo
+    AT_mask = IFT(AW_mask)
+    
+    #Buscamos los índices de los picos
+    peaks, _ = find_peaks( Pot(AT_mask), prominence = prominence )
+    
     soliton_count = 0
-
-    # For each peak, fit a sech function to the time domain signal
+    
     for peak in peaks:
-        # Extract a window around the peak
-        window = AT_masked[-1, peak-10:peak+10]
-
-        # Fit a sech function to the windowed signal
-        popt, pcov = curve_fit(sech, np.arange(len(window)), np.abs(window))
-
-        # Check the quality of the fit
-        residuals = window - sech(np.arange(len(window)), *popt)
+        #Extraemos una ventana alrededor de un pico
+        window = AT_mask[peak-window_size:peak+window_size]
+        
+        #Ventana temporal
+        t_window = sim.tiempo[peak-window_size:peak+window_size]
+        
+        #Parámetros iniciales de ajuste
+        p0 = [Pot(AT_mask[peak]), sim.tiempo[peak], 1, 0]
+        
+        #Tomamos el ajuste
+        popt, pcov = curve_fit(soliton_fit, t_window, Pot(window), p0 = p0)
+        
+        #Vemos calidad del ajuste
+        residuals = Pot(window) - soliton_fit(t_window, *popt)
         rss = np.sum(residuals**2)
+        
+        print(popt)
+        plt.figure()
+        plt.plot(t_window, Pot(window), ".", label="Datos")
+        plt.plot(t_window, soliton_fit(t_window, *popt), label="Ajuste, rss: "+str(rss))
+        plt.legend(loc="best")
+        plt.grid(True, alpha=.3)
+        plt.show()
 
-        # If the fit is good, increment the soliton count
-        if rss < 1e-6:
+        #Si el ajuste es bueno, aumentamos la cuenta de solitones
+        if rss < 1e3:
             soliton_count += 1
-
+    
     return soliton_count
+
+n_solitons = soliton_number(fibra, sim, AW)
 
 #Solucionar la función de arriba
 #find_solitons(AT, AW, 100, mask_start, mask_end)
