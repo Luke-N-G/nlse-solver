@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
 
-AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/sg1", resim = True)
 AW = np.stack(AW)
 AT = np.stack(AT)
 zlocs = np.linspace(0, 300, len(AT))
@@ -39,9 +39,9 @@ mask_start_idx = np.argmin( np.abs(sim.freq - maskw_start)  )
 mask_end_idx = np.argmin( np.abs(sim.freq - maskw_end)  )
 
 #Esto corta al AW entre los índices que cumplan lo de arriba
-AW_cut = AW[-1][:mask_start_idx]
+AW_cut = AW[0][:mask_start_idx]
 AW_cut = np.append(AW_cut, np.zeros_like(sim.freq[mask_start_idx:mask_end_idx]) )
-AW_cut = np.append(AW_cut, AW[-1][mask_end_idx:])
+AW_cut = np.append(AW_cut, AW[0][mask_end_idx:])
 
 plt.figure()
 plt.plot( fftshift(sim.freq), fftshift(Pot(AW_cut)) )
@@ -49,11 +49,11 @@ plt.show()
 
 plt.figure()
 plt.plot( sim.tiempo, Pot(IFT(AW_cut)))
-plt.plot( sim.tiempo, Pot(IFT(AW[-1])))
+plt.plot( sim.tiempo, Pot(IFT(AW[0])))
 plt.show()
 
 
-peaks, _ = find_peaks( Pot(IFT(AW_cut)), prominence = 10)
+peaks, _ = find_peaks( Pot(IFT(AW_cut)), prominence = 10, width=None)
 
 plt.figure()
 plt.plot(sim.tiempo, Pot(IFT(AW_cut)))
@@ -63,14 +63,14 @@ plt.show()
 #%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
 
 def soliton_fit(T, amplitude, center, width, offset):
-    carrier = np.sqrt(amplitude)*( 1/np.cosh( (T - center)/width) ) + offset
+    carrier = np.sqrt(amplitude)*( 1/np.cosh( (T - center)/width) ) + offset*0
     return np.abs( carrier )**2
 
 
 def soliton_number(fib:Fibra, sim:Sim, AW):
     
     prominence  = 10  #Prominencia, para hallar picos
-    window_size = 40  #Número de puntos alrededor de cada pico
+    window_size = 100  #Número de puntos alrededor de cada pico
     
     #Buscamos freq. donde enmascarar
     mask_i     = fibra.lambda_to_omega( fibra.zdw )/(2*np.pi)
@@ -110,17 +110,50 @@ def soliton_number(fib:Fibra, sim:Sim, AW):
         residuals = Pot(window) - soliton_fit(t_window, *popt)
         rss = np.sum(residuals**2)
         
+        #------TESTING GROUND--------
+        #Estudiamos el espectro
+        
+        #Armamos un vector que sea = 0 en todos lados, menos en el pulso de estudio
+        pulse_window = np.zeros_like(sim.tiempo, dtype=complex)
+        pulse_window[peak-window_size:peak+window_size] = window
+        
+        #Transformamos a espectro
+        spectral_window = IFT(pulse_window)
+        
+        #Buscamos el máximo espectral
+        spectral_peaks, spectral_peak_prop = find_peaks( Pot(spectral_window), height=0 )
+        
+        #Identificamos el pico máximo
+        max_peak_index = np.argmax(spectral_peak_prop['peak_heights'])
+        max_peak = peaks[max_peak_index] #ESTO NO ANDA
+        
+        plt.figure()
+        plt.plot(sim.freq[max_peak], Pot(spectral_window)[max_peak])
+        plt.plot(fftshift(sim.freq), fftshift(Pot(spectral_window)))
+        plt.show()
+        
+        
+        #Parámetros para hallar el N del solitón
+        pulse_amp   = Pot(AT_mask[peak])
+        pulse_width = popt[2]
+        soliton_order = np.sqrt(pulse_amp * pulse_width**2 * fib.gamma / np.abs(fibra.beta2) )
+        
         print(popt)
         plt.figure()
         plt.plot(t_window, Pot(window), ".", label="Datos")
-        plt.plot(t_window, soliton_fit(t_window, *popt), label="Ajuste, rss: "+str(rss))
+        plt.plot(t_window, soliton_fit(t_window, *popt), label="Ajuste, N: "+str(soliton_order))
         plt.legend(loc="best")
         plt.grid(True, alpha=.3)
         plt.show()
+        
+        
 
-        #Si el ajuste es bueno, aumentamos la cuenta de solitones
-        if rss < 1e3:
+        #Si el orden está entre 0.5 y 1.5, contamos
+        if 0.5 <= soliton_order <= 1.5:
             soliton_count += 1
+
+        #if rss < 1e3:
+        #    soliton_count += 1
     
     return soliton_count
 
