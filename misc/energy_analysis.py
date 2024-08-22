@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
 
-AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/sg1", resim = True)
 AW = np.stack(AW)
 AT = np.stack(AT)
 zlocs = np.linspace(0, 300, len(AT))
@@ -43,21 +43,23 @@ AW_cut = AW[-1][:mask_start_idx]
 AW_cut = np.append(AW_cut, np.zeros_like(sim.freq[mask_start_idx:mask_end_idx]) )
 AW_cut = np.append(AW_cut, AW[-1][mask_end_idx:])
 
-plt.figure()
-plt.plot( fftshift(sim.freq), fftshift(Pot(AW_cut)) )
-plt.show()
 
 plt.figure()
-plt.plot( sim.tiempo, Pot(IFT(AW_cut)))
-plt.plot( sim.tiempo, Pot(IFT(AW[-1])))
+plt.plot( sim.tiempo, Pot(IFT(AW_cut)), label = "Masked spectrum")
+plt.plot( sim.tiempo, Pot(IFT(AW[-1])), label = "Full signal", alpha = .5)
+plt.legend(loc="best")
+plt.title("Filter comparison")
+plt.grid(True,alpha=.3)
 plt.show()
 
 
-peaks, _ = find_peaks( Pot(IFT(AW_cut)), prominence = 10, height=0)
+peaks, _ = find_peaks( Pot(IFT(AW_cut)), prominence = 50, height=0)
 
 plt.figure()
 plt.plot(sim.tiempo, Pot(IFT(AW_cut)))
 plt.plot(sim.tiempo[peaks], Pot(IFT(AW_cut))[peaks], "x")
+plt.title("Peaks")
+plt.grid(True,alpha=.3)
 plt.show()
 
 #%% Análisis de pulsos a la salida (Ajuste con secante hiperbólica)
@@ -69,7 +71,7 @@ def soliton_fit(T, amplitude, center, width, offset):
 
 def soliton_number(fib:Fibra, sim:Sim, AW):
     
-    prominence  = 10  #Prominencia, para hallar picos
+    prominence  = 50  #Prominencia, para hallar picos
     window_size = 100 #Número de puntos alrededor de cada pico
     z_index     = -1  #A que z analizamos (se podría pasar como variable de función)
     
@@ -105,7 +107,7 @@ def soliton_number(fib:Fibra, sim:Sim, AW):
         p0 = [Pot(AT_mask[peak]), sim.tiempo[peak], 1, 0]
         
         #Tomamos el ajuste
-        popt, pcov = curve_fit(soliton_fit, t_window, Pot(window), p0 = p0)
+        popt, pcov = curve_fit(soliton_fit, t_window, Pot(window), p0 = p0, maxfev = 10000)
         
         #Vemos calidad del ajuste
         residuals = Pot(window) - soliton_fit(t_window, *popt)
@@ -127,13 +129,11 @@ def soliton_number(fib:Fibra, sim:Sim, AW):
         #Frecuencia central del pulso
         pulse_centerfreq = sim.freq[max_peak_index]*-1
         
-# =============================================================================
-#         print(fibra.omega_to_lambda(pulse_centerfreq))
-#         plt.figure()
-#         plt.plot(fftshift(sim.freq), fftshift(Pot(spectral_window)))
-#         plt.plot(sim.freq[max_peak_index], Pot(spectral_window)[max_peak_index], "x")
-#         plt.show()
-# =============================================================================
+        print(fibra.omega_to_lambda(pulse_centerfreq))
+        plt.figure()
+        plt.plot(fftshift(sim.freq), fftshift(Pot(spectral_window)))
+        plt.plot(sim.freq[max_peak_index], Pot(spectral_window)[max_peak_index], "x")
+        plt.show()
         
         pulse_gamma = fibra.gamma_w(pulse_centerfreq)
         pulse_beta2 = fibra.beta2_w(pulse_centerfreq)
@@ -153,7 +153,7 @@ def soliton_number(fib:Fibra, sim:Sim, AW):
         
 
         #Si el orden está entre 0.5 y 1.5, contamos
-        if 0.5 <= soliton_order <= 1.5:
+        if 0.5 <= soliton_order <= 1.5*2:
             soliton_count += 1
 
         #if rss < 1e3:
