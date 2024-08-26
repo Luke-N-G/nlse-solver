@@ -11,13 +11,34 @@ import pickle
 import datetime
 
 
-#FFT siguiendo la convención -iw (Agrawal)
-def FT(pulso):
-    return ifft(pulso) * len(pulso)
+# =============================================================================
+# FFTs viejas, conservar en caso de que las nuevas no funcionen bien.
+# #FFT siguiendo la convención -iw (Agrawal)
+# def FT(pulso):
+#     return ifft(pulso) * len(pulso)
+# 
+# #IFFT siguiendo la convención -iw
+# def IFT(espectro):
+#     return fft(espectro) / len(espectro)
+# =============================================================================
 
-#IFFT siguiendo la convención -iw
+# FFT siguiendo la convención -iw (Agrawal)
+def FT(pulso):
+    if pulso.ndim == 1:
+        return ifft(pulso) * len(pulso)
+    elif pulso.ndim == 2:
+        return ifft(pulso, axis=1) * pulso.shape[1]
+    else:
+        raise ValueError("Input must be a 1D or 2D array")
+
+# IFFT siguiendo la convención -iw
 def IFT(espectro):
-    return fft(espectro) / len(espectro)
+    if espectro.ndim == 1:
+        return fft(espectro) / len(espectro)
+    elif espectro.ndim == 2:
+        return fft(espectro, axis=1) / espectro.shape[1]
+    else:
+        raise ValueError("Input must be a 1D or 2D array")
 
 #Pasamos de array tiempo a array frecuencia
 def t_a_freq(t_o_freq):
@@ -215,22 +236,6 @@ def loader(filename, resim = None):
 
 # Cargando metadata en las clases
 # Devuelve objetos sim:Sim and fib:Fibra objects, ya cargados con los parámetros.
-
-
-# =============================================================================
-# def ReSim(metadata):
-#     # Load the saved parameters in metadata to the Sim and Fibra classes, returning sim and fibra objects.
-#     sim = Sim(**metadata['Sim'])
-#     
-#     # Define the parameters that Fibra class's __init__ method accepts
-#     fibra_params = ['L', 'beta2', 'beta3', 'gamma', 'gamma1', 'alpha', 'lambda0', 'TR', 'fR', 'betas']
-#     
-#     # Filter the metadata to only include the parameters that Fibra class's __init__ method accepts
-#     fib_m = {k: v for k, v in metadata['Fibra'].items() if k in fibra_params}
-#     
-#     fibra = Fibra(**fib_m)
-#     return sim, fibra
-# =============================================================================
 
 def ReSim(metadata):
     # Define the parameters that Sim class's __init__ method accepts
