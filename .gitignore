@@ -12,3 +12,4 @@ run_loop_quartic_ref.py
 run_TwoPulse_bizero.py
 run_loop_bizero.py
 soliton_gen/
+soliton_number.py

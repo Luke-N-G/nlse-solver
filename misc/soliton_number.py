@@ -5,6 +5,8 @@ Created on Thr Aug 22 10:10:32 2024
 @author: d/dt Lucas
 """
 
+#%% Imports
+
 import numpy as np
 from common.commonfunc import ReSim, FT, IFT, fftshift, Pot, Fibra, Sim, Adapt_Vector
 from scipy.optimize import curve_fit
@@ -100,3 +102,9 @@ def soliton_number(fib:Fibra, sim:Sim, AW):
             soliton_count += 1
     
     return soliton_count
+
+#%% Testing
+
+savedic = "soliton_gen/"
+
+AW, sim, fibra = modloader(savedic+"100", resim=True)
