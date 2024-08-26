@@ -44,14 +44,14 @@ offset_1 = 0
 
 
 #Parámetros pulso 2:
-Lambda2  = 1500#1480
-amp_2    = 10#20#30*1
-ancho_2  = 2100e-3
+Lambda2  = 1480
+amp_2    = 90
+ancho_2  = 8000e-3
 offset_2 = 20 
 
 
 #Parametros para la fibra
-L     = 500                   #Lfib:   m
+L     = 300                   #Lfib:   m
 b2    = -4.4e-3*1                  #Beta2:  ps^2/km
 b3    = 0.13e-3*1                  #Beta3:  ps^3/km
 gam   = 2.5e-3*1                   #Gamma:  1/Wkm
@@ -61,8 +61,8 @@ w_znw = 2*np.pi*c/lambda_znw
 gam1 = -gam/(w_znw - omega0)*1
 
 alph  = 0                        #alpha:  dB/m
-TR    = 3e-3*0                   #TR:     fs
-fR    = 0.18*0                   #fR:     adimensional (0.18)
+TR    = 3e-3*1                   #TR:     fs
+fR    = 0.18*1                   #fR:     adimensional (0.18)
 
 #Diferencia de frecuencias
 nu2     = c/Lambda2
@@ -94,7 +94,6 @@ chime.success()
 
 
 #%%
-
 
 plotinst(sim, fibra, AT, AW, dB=False , wavelength=True, zeros=True, end=-1)
 
