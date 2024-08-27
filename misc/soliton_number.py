@@ -40,7 +40,7 @@ def soliton_number(fib:Fibra, sim:Sim, AW,
                    z_index = -1, plot_signal=False, plot_fits=False, prominence = 50, window_size = 100):
     
     prominence  = 50  #Prominencia, para hallar picos
-    window_size = 25 #Número de puntos alrededor de cada pico
+    window_size = 50 #Número de puntos alrededor de cada pico
     z_index     = z_index  #A que z analizamos (se podría pasar como variable de función)
     
     #Buscamos freq. donde enmascarar
@@ -141,8 +141,10 @@ def max_soliton_count(fib, sim, AW, z_indices):
 # Hallar parametros (Solo funciona para el barrido de 1 a 100!)
 def get_parameters(task_id):
     # Definimos los rangos de parámetros
-    peak_power_values = range(0, 101, 10)  # 0, 10, 20, ..., 100
-    temporal_width_values = [i * 8/10 for i in range(1, 11)]  # 0.1, 1.1, 2.1, ..., 10.1
+    #peak_power_values = range(0, 101, 10)  # 0, 10, 20, ..., 100
+    #temporal_width_values = [i * 8/10 for i in range(1, 11)]  # 0.1, 1.1, 2.1, ..., 10.1
+    peak_power_values = np.linspace(0,100,20)  # 0, 10, 20, ..., 100
+    temporal_width_values = np.linspace(0.5,8, 20)  # 0.1, 1.1, 2.1, ..., 10.1
 
     # Calculamos todas las convinaciones
     total_combinations = len(peak_power_values) * len(temporal_width_values)
@@ -162,19 +164,21 @@ def get_parameters(task_id):
 #Funcion que devuelve matriz de numero de solitones N, y matrices con parámetros potencia y tiempo
 def generate_soliton_matrix():
     # Definimos rangos de los parámetros
-    peak_power_values = range(0, 101, 10)  # 0, 10, 20, ..., 100
-    temporal_width_values = [i * 8/10 for i in range(1, 11)]  # 0.8, 1.6, 2.4, ..., 8.0
+    #peak_power_values = range(0, 101, 10)  # 0, 10, 20, ..., 100
+    #temporal_width_values = [i * 8/10 for i in range(1, 11)]  # 0.8, 1.6, 2.4, ..., 8.0
+    peak_power_values = np.linspace(0,100,20)  # 0, 10, 20, ..., 100
+    temporal_width_values = np.linspace(0.5,8, 20)  # 0.1, 1.1, 2.1, ..., 10.1
 
     # Initialize the N matrix
-    N = np.zeros((len(peak_power_values)-1, len(temporal_width_values)))
-    P = np.zeros((len(peak_power_values)-1, len(temporal_width_values)))
-    T = np.zeros((len(peak_power_values)-1, len(temporal_width_values)))
+    N = np.zeros((len(peak_power_values), len(temporal_width_values)))
+    P = np.zeros((len(peak_power_values), len(temporal_width_values)))
+    T = np.zeros((len(peak_power_values), len(temporal_width_values)))
 
     # Iteramos sobre los task_id
-    for task_id in range(1, 101):
+    for task_id in range(1, 401):
         # Cargamos los datos numerados entre 1 y 100
         try:
-            AW, sim, fibra = modloader("soliton_gen/firstsweep/" + str(task_id), resim=True)
+            AW, sim, fibra = modloader("soliton_gen/secondsweep/" + str(task_id), resim=True)
         except Exception as e:
             print(f"Error loading data for task_id {task_id}: {e}")
             continue
