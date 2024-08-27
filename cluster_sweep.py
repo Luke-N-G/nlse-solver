@@ -12,7 +12,8 @@ import sys
 import pickle
 import datetime
 import time
-from common.commonfunc import Sim, Fibra, Two_Pulse
+from common.commonfunc    import Sim, Fibra, Two_Pulse
+from common.plotter       import plotcmap
 from solvers.solvepcGNLSE import Solve_pcGNLSE
 
 #%% Guardado alternativo: Solo guardamos el espectro
@@ -45,8 +46,8 @@ def modsaver(AW, sim:Sim, fib:Fibra, filename, other_par = None):
 
 def get_parameters(task_id):
     # Define parameter ranges
-    peak_power_values = range(0, 101, 10)  # 0, 10, 20, ..., 100
-    temporal_width_values = [i * 8/10 for i in range(1, 11)]  # 0.1, 1.1, 2.1, ..., 10.1
+    peak_power_values = np.linspace(0,100,20)  # 0, 10, 20, ..., 100
+    temporal_width_values = np.linspace(0.5,8, 20)  # 0.1, 1.1, 2.1, ..., 10.1
 
     # Calculate the total number of combinations
     total_combinations = len(peak_power_values) * len(temporal_width_values)
@@ -124,7 +125,7 @@ pulso = Two_Pulse(sim.tiempo, amp_1, amp_2, ancho_1, ancho_2, offset_1, offset_2
 
 #---pcgNLSE---
 t0 = time.time()
-zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=100)
+zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=100, pbar=False)
 t1 = time.time()
 
 total_n = t1 - t0 #Implementar en Solve_pcGNLSE
@@ -132,8 +133,11 @@ print("Time",np.round(total_n/60,2),"(min)")
 
 #%% Guardando el resultado
 
-savedic = "data/firstsweep/"+str(task_id)
+savedic = "data/secondsweep/"
 
-modsaver(AW, sim, fibra, savedic, f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
+modsaver(AW, sim, fibra, savedic+str(task_id), f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
+
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1450,1750],
+          vlims=[-20,50,0,120], zeros=False, save=savedic+"plots/"+str(task_id)+"plotcmap")
 
 
