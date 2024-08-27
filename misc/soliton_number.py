@@ -223,9 +223,13 @@ def plot_soliton_matrix(N, P, T, cmap="viridis"):
     # Create the plot
     plt.figure(figsize=(10, 8))
     
+    
+    dT = (np.unique(T)[1] - np.unique(T)[0])/2
+    dP = (np.unique(P)[1] - np.unique(P)[0])/2
+    
     plt.imshow(N, aspect='auto', origin='lower',
-               extent=[temporal_width_values[0] - 0.4, temporal_width_values[-1] + 0.4, peak_power_values[0] - 5,
-                       peak_power_values[-1] + 5], interpolation='None', cmap=cmap)
+               extent=[temporal_width_values[0] - dT, temporal_width_values[-1] + dT, peak_power_values[0] - dP,
+                       peak_power_values[-1] + dP], interpolation='None', cmap=cmap)
 
     
     # Set axis labels
@@ -237,7 +241,7 @@ def plot_soliton_matrix(N, P, T, cmap="viridis"):
     cbar.set_label('Number of Solitons')
     
     # Set color bar ticks at the middle of each color
-    tick_locs = (np.arange(0, np.max(N) + 1) + 0.5) * (np.max(N) / (np.max(N) + 1))
+    tick_locs = (np.arange(0, np.max(N) +1) + 0.5) * (np.max(N) / (np.max(N) + 1))
     cbar.set_ticks(tick_locs)
     cbar.set_ticklabels(np.arange(0, np.max(N) + 1))
     
@@ -286,6 +290,10 @@ print("N=" + str(N))
 print("P=" + str(P))
 print("T=" + str(T))
 
+#%% Poteo
+
 plot_soliton_matrix(N,P,T, cmap="viridis")
+
+
 
 
