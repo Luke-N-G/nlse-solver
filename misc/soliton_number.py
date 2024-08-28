@@ -233,20 +233,20 @@ def plot_soliton_matrix(N, P, T, cmap="viridis"):
 
     
     # Set axis labels
-    plt.xlabel('Temporal Width (ps)')
-    plt.ylabel('Peak Power (W)')
+    plt.xlabel('Temporal width (ps)')
+    plt.ylabel('Peak power (W)')
     
     # Add color bar
     cbar = plt.colorbar()
-    cbar.set_label('Number of Solitons')
+    cbar.set_label('Number of solitons')
     
     # Set color bar ticks at the middle of each color
     tick_locs = (np.arange(0, np.max(N) +1) + 0.5) * (np.max(N) / (np.max(N) + 1))
     cbar.set_ticks(tick_locs)
-    cbar.set_ticklabels(np.arange(0, np.max(N) + 1))
+    cbar.set_ticklabels(np.arange(0, np.max(N) + 1, dtype=int))
     
     # Set axis ticks
-    plt.xticks(temporal_width_values)
+    plt.xticks(temporal_width_values, np.round(temporal_width_values,1))
     plt.yticks(peak_power_values)
     
     # Show the plot
@@ -270,7 +270,7 @@ plt.figure()
 plt.plot(sim.tiempo, Pot(AT)[-1])
 plt.grid(True,alpha=.3)
 plt.xlabel("Time (ps)")
-plt.ylabel("Peak Power (W)")
+plt.ylabel("Peak power (W)")
 plt.xlim([-25,25])
 plt.show()
 
@@ -292,8 +292,33 @@ print("T=" + str(T))
 
 #%% Poteo
 
-plot_soliton_matrix(N,P,T, cmap="viridis")
+plot_soliton_matrix(N,P,T, cmap="viridis") #
+
+# Calculate the proportionality constant C for each combination
+C = N**2 / (P * T**2)
+
+# Filter out 0 and NaN values
+C_filtered = C[(C != 0) & ~np.isnan(C)]
+
+# Calculate the average C, ignoring any NaN or infinite values
+average_C = np.nanmean(C_filtered)
+average_C = 0.0564
+
+#Coefficients for N = 2, 8 and 14
+Cs = [0.01913564300544409, 0.052237904476461934, 0.05139802631578946]
 
 
+T_plot = np.unique(T)
+T_plot = np.append(T_plot,[8.2])
+T_plot = np.insert(T_plot,0,0.3)
+cmap = plt.get_cmap('Greys')
+test_N = [2,8,14]
+styles = ["--","-.",":"]
+for i,j in enumerate(test_N): #range(1,19):
+    color = cmap(i / 3)
+    plt.plot(T_plot, (j)**2 /(Cs[i] * T_plot**2), color="white", label="N= "+str(j), ls=styles[i])
+    plt.ylim([-2.5,102.5])
+    plt.xlim([0.3,8.2])
+plt.legend(loc="lower left")
 
 
