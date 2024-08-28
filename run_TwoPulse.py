@@ -45,8 +45,8 @@ offset_1 = 0
 
 #Parámetros pulso 2:
 Lambda2  = 1480
-amp_2    = 90
-ancho_2  = 8000e-3
+amp_2    = 30
+ancho_2  = 5750e-3
 offset_2 = 20 
 
 
@@ -83,7 +83,7 @@ pulso = Two_Pulse(sim.tiempo, amp_1, amp_2, ancho_1, ancho_2, offset_1, offset_2
 
 #---pcgNLSE---
 t0 = time.time()
-zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=300)
+zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=300, tau1=4e-3)
 t1 = time.time()
 
 total_n = t1 - t0 #Implementar en Solve_pcGNLSE
@@ -101,7 +101,7 @@ plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 
 plotspecgram(sim, fibra, AT, zeros=True)
 
-plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=False, Tlim=[-30,30], Wlim=[1400,1700],
           vlims=[-20,50,0,120], zeros=True,plot_type="both")
 
 #%% Extra1
