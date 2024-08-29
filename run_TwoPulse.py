@@ -101,7 +101,7 @@ plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 
 plotspecgram(sim, fibra, AT, zeros=True)
 
-plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=False, Tlim=[-30,30], Wlim=[1400,1700],
+plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
           vlims=[-20,50,0,120], zeros=True,plot_type="both")
 
 #%% Extra1
