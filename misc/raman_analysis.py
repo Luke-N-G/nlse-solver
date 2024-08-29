@@ -39,7 +39,7 @@ def soliton_fit(T, amplitude, center, width, offset):
 def soliton_number(fib:Fibra, sim:Sim, AW,
                    z_index = -1, plot_signal=False, plot_fits=False, prominence = 50, window_size = 100):
     
-    prominence  = 65  #Prominencia, para hallar picos
+    prominence  = 70  #Prominencia, para hallar picos
     window_size = 50 #Número de puntos alrededor de cada pico
     z_index     = z_index  #A que z analizamos (se podría pasar como variable de función)
     
@@ -292,18 +292,21 @@ def Raman_reflection(fib:Fibra, sim:Sim, AT, AW, zindex=-1, window_size = 100, p
     print(reflection_ratio+transmission_ratio+soliton_gain_ratio)
     print(reflected_energy/transmitted_energy)
     
-    plt.figure()
-    plt.plot(sim.tiempo[last_peak_index-window_size:last_peak_index+window_size],
-             Pot(AT_end[last_peak_index-window_size:last_peak_index+window_size]))
-    
-    return reflection_ratio, transmission_ratio
-    
+    return reflected_energy, transmitted_energy, n_solitons
+
+def lambda_gain_raman(lam0, tau1):
+    c = 299792458 * (1e9)/(1e12)
+    delta_lambda = lam0**2/(2*np.pi*tau1*c)
+    return delta_lambda
+
+tau1_vec = lambda_gain_raman(1550, np.linspace(1,200,20))
+freq_vec = 1/(tau1_vec*2*np.pi)
 
 #%% Testeo individual
 
-savedic = "soliton_gen/firstsweep/"
+savedic = "soliton_gen/ramansweep/"
 
-AW, sim, fibra = modloader(savedic+"67", resim=True)
+AW, sim, fibra = modloader(savedic+"20", resim=True)
 AT = IFT(AW)
 zlocs = np.linspace(0,300,100)
 
@@ -318,45 +321,54 @@ plt.ylabel("Peak power (W)")
 plt.xlim([-25,25])
 plt.show()
 
-Rf, Tr = Raman_reflection(fibra, sim, AT, AW)
+Rf, Tr, N_s = Raman_reflection(fibra, sim, AT, AW)
 
 #%% Uso sobre todos los datos
 
-# Example usage
-N, P, T = generate_soliton_matrix()
-print("N=" + str(N))
-print("P=" + str(P))
-print("T=" + str(T))
+savedic="soliton_gen/ramansweep/"
 
-#%% Poteo
+Rf_v = np.zeros(20)
+Tr_v = np.zeros(20)
+N_sv  = np.zeros(20)
+zlocs = np.linspace(0,300,100)
+for i in range(1,21):
+    AW, sim, fibra = modloader(savedic+str(i), resim=True)
+    AT = IFT(AW)
+    Rf, Tr, N_s = Raman_reflection(fibra, sim, AT, AW)
+    Rf_v[i-1] = Rf
+    Tr_v[i-1] = Tr
+    N_sv[i-1]  = N_s
+N_sv = N_sv - 1
+    
+Ratio = Rf_v/Tr_v
 
-plot_soliton_matrix(N,P,T, cmap="viridis") #
+#%% Ploteo
 
-# Calculate the proportionality constant C for each combination
-C = N**2 / (P * T**2)
-
-# Filter out 0 and NaN values
-C_filtered = C[(C != 0) & ~np.isnan(C)]
-
-# Calculate the average C, ignoring any NaN or infinite values
-average_C = np.nanmean(C_filtered)
-average_C = 0.0564
-
-#Coefficients for N = 2, 8 and 14
-Cs = [0.01913564300544409, 0.052237904476461934, 0.05139802631578946]
-
-
-T_plot = np.unique(T)
-T_plot = np.append(T_plot,[8.2])
-T_plot = np.insert(T_plot,0,0.3)
-cmap = plt.get_cmap('Greys')
-test_N = [2,8,14]
-styles = ["--","-.",":"]
-for i,j in enumerate(test_N): #range(1,19):
-    color = cmap(i / 3)
-    plt.plot(T_plot, (j)**2 /(Cs[i] * T_plot**2), color="white", label="N= "+str(j), ls=styles[i])
-    plt.ylim([-2.5,102.5])
-    plt.xlim([0.3,8.2])
-plt.legend(loc="lower left")
+plt.figure()
+plt.plot(freq_vec, Ratio)
+plt.plot(freq_vec, N_sv, ".--")
+plt.xlabel("Maximum gain frequency (THz)")
+plt.ylabel("$E_R/E_T$")
+plt.grid(True,alpha=.3)
+plt.title("Reflection as a function of maximum raman gain frequency")
+plt.show()
 
 
+
+fig, ax1 = plt.subplots()
+
+color = 'tab:red'
+ax1.set_xlabel("Maximum gain frequency (THz)")
+ax1.set_ylabel("$E_R/E_T$", color=color)
+ax1.plot(freq_vec, Ratio, color=color)
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
+
+color = 'tab:blue'
+ax2.set_ylabel("Number of solitons", color=color)  # we already handled the x-label with ax1
+ax2.plot(freq_vec, N_sv, ".--", color=color)
+ax2.tick_params(axis='y', labelcolor=color)
+
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+plt.show()

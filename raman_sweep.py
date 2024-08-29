@@ -44,7 +44,6 @@ def modsaver(AW, sim:Sim, fib:Fibra, filename, other_par = None):
                     
 #%% Para el loop del cluster
 
-
 def lambda_gain_raman(lam0, tau1):
     c = 299792458 * (1e9)/(1e12)
     delta_lambda = lam0**2/(2*np.pi*tau1*c)
@@ -52,7 +51,7 @@ def lambda_gain_raman(lam0, tau1):
 
 tau1_vec = lambda_gain_raman(1550, np.linspace(1,200,20))
 
-task_id = int(sys.argv[1])
+task_id = 10#int(sys.argv[1])
 tau1 = tau1_vec[task_id-1]
 
 print("tau1: "+str(tau1))
@@ -61,8 +60,8 @@ print("lambda: "+str(lambda_gain_raman(1550, tau1)))
 
 #%% Parámetros de simulación
 
-N = int(2**14) #puntos
-Tmax = 70      #ps
+N = int(2*2**14) #puntos
+Tmax = 2*70      #ps
 
 c = 299792458 * (1e9)/(1e12)
 
@@ -113,7 +112,7 @@ pulso = Two_Pulse(sim.tiempo, amp_1, amp_2, ancho_1, ancho_2, offset_1, offset_2
 
 #---pcgNLSE---
 t0 = time.time()
-zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, tau1=tau1, z_locs=100, pbar=False)
+zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, tau1=tau1, z_locs=100, pbar=True)
 t1 = time.time()
 
 total_n = t1 - t0 #Implementar en Solve_pcGNLSE
