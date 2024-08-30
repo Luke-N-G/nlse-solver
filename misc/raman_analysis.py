@@ -39,7 +39,7 @@ def soliton_fit(T, amplitude, center, width, offset):
 def soliton_number(fib:Fibra, sim:Sim, AW,
                    z_index = -1, plot_signal=False, plot_fits=False, prominence = 50, window_size = 100):
     
-    prominence  = 70  #Prominencia, para hallar picos
+    prominence  = 100  #Prominencia, para hallar picos
     window_size = 50 #Número de puntos alrededor de cada pico
     z_index     = z_index  #A que z analizamos (se podría pasar como variable de función)
     
@@ -299,7 +299,7 @@ def lambda_gain_raman(lam0, tau1):
     delta_lambda = lam0**2/(2*np.pi*tau1*c)
     return delta_lambda
 
-tau1_vec = lambda_gain_raman(1550, np.linspace(1,200,20))
+tau1_vec = lambda_gain_raman(1550, np.linspace(1,250,50))
 freq_vec = 1/(tau1_vec*2*np.pi)
 
 #%% Testeo individual
@@ -325,13 +325,13 @@ Rf, Tr, N_s = Raman_reflection(fibra, sim, AT, AW)
 
 #%% Uso sobre todos los datos
 
-savedic="soliton_gen/ramansweep/"
+savedic="soliton_gen/ramansweep3_short/"
 
-Rf_v = np.zeros(20)
-Tr_v = np.zeros(20)
-N_sv  = np.zeros(20)
+Rf_v = np.zeros(50)
+Tr_v = np.zeros(50)
+N_sv  = np.zeros(50)
 zlocs = np.linspace(0,300,100)
-for i in range(1,21):
+for i in range(1,51):
     AW, sim, fibra = modloader(savedic+str(i), resim=True)
     AT = IFT(AW)
     Rf, Tr, N_s = Raman_reflection(fibra, sim, AT, AW)
@@ -344,20 +344,11 @@ Ratio = Rf_v/Tr_v
 
 #%% Ploteo
 
-plt.figure()
-plt.plot(freq_vec, Ratio)
-plt.plot(freq_vec, N_sv, ".--")
-plt.xlabel("Maximum gain frequency (THz)")
-plt.ylabel("$E_R/E_T$")
-plt.grid(True,alpha=.3)
-plt.title("Reflection as a function of maximum raman gain frequency")
-plt.show()
-
-
+alt_N = [2,1,2,2,2,2,2,3,4,4,5,3,3,2,1,2,1,0,0,0]
 
 fig, ax1 = plt.subplots()
 
-color = 'tab:red'
+color = 'tab:blue'
 ax1.set_xlabel("Maximum gain frequency (THz)")
 ax1.set_ylabel("$E_R/E_T$", color=color)
 ax1.plot(freq_vec, Ratio, color=color)
@@ -365,8 +356,9 @@ ax1.tick_params(axis='y', labelcolor=color)
 
 ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
 
-color = 'tab:blue'
+color = 'tab:red'
 ax2.set_ylabel("Number of solitons", color=color)  # we already handled the x-label with ax1
+ax2.set_yticks( np.unique(N_sv) )
 ax2.plot(freq_vec, N_sv, ".--", color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
