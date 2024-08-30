@@ -40,7 +40,7 @@ def soliton_number(fib:Fibra, sim:Sim, AW,
                    z_index = -1, plot_signal=False, plot_fits=False, prominence = 50, window_size = 100):
     
     prominence  = 100  #Prominencia, para hallar picos
-    window_size = 50 #Número de puntos alrededor de cada pico
+    window_size = 15 #Número de puntos alrededor de cada pico
     z_index     = z_index  #A que z analizamos (se podría pasar como variable de función)
     
     #Buscamos freq. donde enmascarar
