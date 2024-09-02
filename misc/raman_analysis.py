@@ -39,8 +39,8 @@ def soliton_fit(T, amplitude, center, width, offset):
 def soliton_number(fib:Fibra, sim:Sim, AW,
                    z_index = -1, plot_signal=False, plot_fits=False, prominence = 50, window_size = 100):
     
-    prominence  = 100  #Prominencia, para hallar picos
-    window_size = 15 #Número de puntos alrededor de cada pico
+    prominence  = 50  #Prominencia, para hallar picos
+    window_size = 50 #Número de puntos alrededor de cada pico
     z_index     = z_index  #A que z analizamos (se podría pasar como variable de función)
     
     #Buscamos freq. donde enmascarar
@@ -325,7 +325,7 @@ Rf, Tr, N_s = Raman_reflection(fibra, sim, AT, AW)
 
 #%% Uso sobre todos los datos
 
-savedic="soliton_gen/ramansweep3_short/"
+savedic="soliton_gen/ramansweep2/"
 
 Rf_v = np.zeros(50)
 Tr_v = np.zeros(50)
