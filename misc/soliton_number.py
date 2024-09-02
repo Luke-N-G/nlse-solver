@@ -254,6 +254,54 @@ def plot_soliton_matrix(N, P, T, cmap="viridis"):
     plt.grid(True, alpha=0.3)
     plt.show()
     
+def plot_soliton_matrix2(N, P, T, cmap="viridis", tick_labels_size=10, tick_labels_format="{:.1f}", label_size=12, skip_ticks=False):
+    # Extract unique peak power and temporal width values
+    peak_power_values = np.unique(P)
+    temporal_width_values = np.unique(T)
+
+    # Create a colormap with discrete colors
+    cmap = plt.cm.get_cmap(cmap, int(np.max(N)) + 1)
+
+    # Create the plot
+    plt.figure(figsize=(10, 8))
+
+    dT = (np.unique(T)[1] - np.unique(T)[0]) / 2
+    dP = (np.unique(P)[1] - np.unique(P)[0]) / 2
+
+    plt.imshow(N, aspect='auto', origin='lower',
+               extent=[temporal_width_values[0] - dT, temporal_width_values[-1] + dT, peak_power_values[0] - dP,
+                       peak_power_values[-1] + dP], interpolation='None', cmap=cmap)
+
+    # Set axis labels
+    plt.xlabel('Temporal width (ps)', fontsize=label_size)
+    plt.ylabel('Peak power (W)', fontsize=label_size)
+
+    # Add color bar
+    cbar = plt.colorbar()
+    cbar.set_label('Number of solitons', fontsize=label_size)
+
+    # Set color bar ticks at the middle of each color
+    tick_locs = (np.arange(0, np.max(N) + 1) + 0.5) * (np.max(N) / (np.max(N) + 1))
+    cbar.set_ticks(tick_locs)
+    cbar.set_ticklabels(np.arange(0, np.max(N) + 1, dtype=int))
+
+    # Set axis ticks
+    if skip_ticks:
+        plt.xticks(temporal_width_values, minor=True)
+        plt.yticks(peak_power_values, minor=True)
+        plt.xticks(temporal_width_values[::2], [tick_labels_format.format(val) for val in temporal_width_values[::2]], fontsize=tick_labels_size)
+        plt.yticks(peak_power_values[::2], [tick_labels_format.format(val) for val in peak_power_values[::2]], fontsize=tick_labels_size)
+    else:
+        plt.xticks(temporal_width_values, [tick_labels_format.format(val) for val in temporal_width_values], fontsize=tick_labels_size)
+        plt.yticks(peak_power_values, [tick_labels_format.format(val) for val in peak_power_values], fontsize=tick_labels_size)
+
+    # Set colorbar tick label size
+    cbar.ax.tick_params(labelsize=tick_labels_size)
+
+    # Show the plot
+    #plt.title('Soliton Count Matrix (prominence = 50, window= 50)')
+    plt.grid(True, alpha=0.3, which='both')
+    plt.show()
 
 #%% Testeo individual
 
@@ -292,7 +340,8 @@ print("T=" + str(T))
 
 #%% Poteo
 
-plot_soliton_matrix(N,P,T, cmap="viridis") #
+plot_soliton_matrix2(N,P,T, cmap="YlGnBu_r", tick_labels_size=15,
+                     label_size=17, skip_ticks=True)
 
 # Calculate the proportionality constant C for each combination
 C = N**2 / (P * T**2)
@@ -308,7 +357,7 @@ average_C = 0.0564
 Cs = [0.01913564300544409, 0.052237904476461934, 0.05139802631578946]
 
 
-T_plot = np.unique(T)
+T_plot = np.linspace(np.unique(T)[0], np.unique(T)[-1], 100 )
 T_plot = np.append(T_plot,[8.2])
 T_plot = np.insert(T_plot,0,0.3)
 cmap = plt.get_cmap('Greys')
@@ -316,9 +365,10 @@ test_N = [2,8,14]
 styles = ["--","-.",":"]
 for i,j in enumerate(test_N): #range(1,19):
     color = cmap(i / 3)
-    plt.plot(T_plot, (j)**2 /(Cs[i] * T_plot**2), color="white", label="N= "+str(j), ls=styles[i])
+    plt.plot(T_plot, (j)**2 /(Cs[i] * T_plot**2), color="black", label="N = "+str(j), ls=styles[i], linewidth=2)
     plt.ylim([-2.5,102.5])
     plt.xlim([0.3,8.2])
-plt.legend(loc="lower left")
+legcmap = plt.get_cmap("YlGnBu_r")
+legend = plt.legend(loc="lower left")
 
 

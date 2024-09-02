@@ -344,23 +344,25 @@ Ratio = Rf_v/Tr_v
 
 #%% Ploteo
 
-alt_N = [2,1,2,2,2,2,2,3,4,4,5,3,3,2,1,2,1,0,0,0]
+tick_size = 14
+label_size = 14
 
 fig, ax1 = plt.subplots()
 
-color = 'tab:blue'
-ax1.set_xlabel("Maximum gain frequency (THz)")
-ax1.set_ylabel("$E_R/E_T$", color=color)
+color = 'blue'
+ax1.set_xlabel("Maximum gain frequency (THz)", size=label_size)
+ax1.set_ylabel("$E_R/E_T$", color=color, size=label_size)
 ax1.plot(freq_vec, Ratio, color=color)
-ax1.tick_params(axis='y', labelcolor=color)
+ax1.tick_params(axis='y', labelcolor=color, labelsize=tick_size)
+ax1.tick_params(axis="x", labelsize=tick_size)
 
 ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
 
-color = 'tab:red'
-ax2.set_ylabel("Number of solitons", color=color)  # we already handled the x-label with ax1
+color = 'red'
+ax2.set_ylabel("Number of solitons", color=color, size=label_size)  # we already handled the x-label with ax1
 ax2.set_yticks( np.unique(N_sv) )
-ax2.plot(freq_vec, N_sv, ".--", color=color)
-ax2.tick_params(axis='y', labelcolor=color)
+ax2.plot(freq_vec, N_sv, ".--", color=color, linewidth=0.8)
+ax2.tick_params(axis='y', labelcolor=color, labelsize=tick_size)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()

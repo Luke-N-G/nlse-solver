@@ -23,7 +23,7 @@ zlocs = np.linspace(0, 300, len(AT))
 
 #%% Plotting
 
-plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,
+plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,cmap="YlGnBu_r",
          vlims=[-20,70,0,120], Tlim=[-50,50], Wlim=[1400,1700], zeros=True, plot_type="time")
 
 
