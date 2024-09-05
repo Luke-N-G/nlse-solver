@@ -8,7 +8,7 @@ Created on Tue Jan 23 14:14:05 2024
 import numpy as np
 import matplotlib.pyplot as plt
 from common.commonfunc import Energia, num_fotones, saver, loader, ReSim, FT, IFT, fftshift, Pot, Fibra, Adapt_Vector, Sim
-from common.plotter import plotenergia, plotevol, plotinst, plotspecgram, plot_time, plotcmap
+from common.plotter import plotenergia, plotevol, plotinst, plotspecgram2, plot_time, plotcmap
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
@@ -20,10 +20,10 @@ zlocs = np.linspace(0, 300, len(AT))
 
 #%%
 
-plotcmap(sim, fibra, zlocs, AT, AW, legacy=False, dB=True, wavelength=True,
+plotcmap(sim, fibra, zlocs, AT, AW, legacy=False, dB=False, wavelength=True,
          vlims=[-30,0,-60,0], Tlim=[-25,25], Wlim=[1400,1700], zeros=True, cmap="turbo")
 
-plotinst(sim, fibra, AT, AW, wavelength=True)
+plotspecgram2(sim, fibra, AT, Tlim=[-25,25], dB=True, zeros= True)
 
 #%% Masking Test
 

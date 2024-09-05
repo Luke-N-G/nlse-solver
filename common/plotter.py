@@ -345,6 +345,64 @@ def plotspecgram(sim:Sim, fib:Fibra, AT, Tlim=None, Wlim=None, end=-1, save=None
         plt.close()
     else:
         plt.show()
+        
+        
+def plotspecgram2(sim:Sim, fib:Fibra, AT, Tlim=None, Wlim=None, end=-1, save=None, dB=None, zeros=None, cmap="turbo", noshow=None, dpi=800):
+    
+    AT = AT[end,:]
+    
+    fig, ax = plt.subplots()
+    # x-axis limits
+    xextent = [sim.tiempo[0], sim.tiempo[-1]]
+    # Time span
+    t_span = sim.tiempo[-1] - sim.tiempo[0]
+    # Sampling rate
+    t_sampling = len(sim.tiempo) / t_span    
+    # Colormap
+    cmap = cmap
+    
+    # Escala del gráfico
+    if dB:
+        scale = "dB"
+    else:
+        scale = "linear"
+
+
+    # Compute the spectrogram
+    Pxx, freqs, bins, im = ax.specgram(AT, NFFT=700, noverlap=650, Fs=t_sampling, scale=scale, xextent=xextent, cmap=cmap)
+
+
+    # Add interactive colorbar
+    cbar = fig.colorbar(im, ax=ax, label='Power/Frequency (dB/Hz)' if dB else 'Power/Frequency', location="bottom", aspect=50)
+    cbar.ax.tick_params(labelsize=7)
+
+    
+    if zeros:
+        if fib.w_zdw:
+            freq_zdw = (fib.omega0 - fib.w_zdw) / (2 * np.pi)
+            ax.plot(xextent, [freq_zdw, freq_zdw], "--",color="blue", linewidth=2, label="ZDW = " + str(round(fib.zdw)) + " nm")
+        if fib.w_znw:
+            freq_znw = (fib.omega0 - fib.w_znw) / (2 * np.pi)
+            ax.plot(xextent, [freq_znw, freq_znw], "--", color="red", linewidth=2, label="ZNW = " + str(round(fib.znw)) + " nm")
+        ax.legend(loc="best")
+
+    ax.set_xlabel("Time (ps)")
+    ax.set_ylabel("Frequency (THz)")
+    ax.tick_params(labelsize=10)
+    plt.tight_layout()
+
+    print(np.max(Pxx))
+
+    if Wlim:
+        ax.set_xlim(Tlim)
+    if Tlim:
+        ax.set_ylim(Wlim)
+    if save:
+        plt.savefig(save, dpi=dpi)
+    if noshow:
+        plt.close()
+    else:
+        plt.show()
     
 '''plotenergia: Grafica la energía del pulso y espectro en función de la posición'''
 

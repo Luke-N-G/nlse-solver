@@ -340,7 +340,7 @@ print("T=" + str(T))
 
 #%% Poteo
 
-plot_soliton_matrix2(N,P,T, cmap="YlGnBu_r", tick_labels_size=15,
+plot_soliton_matrix2(N,P,T, cmap="magma", tick_labels_size=15,
                      label_size=17, skip_ticks=True)
 
 # Calculate the proportionality constant C for each combination
