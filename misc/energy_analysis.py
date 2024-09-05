@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import cmasher as cmr
 
-AW, AT, sim, fibra = loader("soliton_gen/sg1", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
 AW = np.stack(AW)
 AT = np.stack(AT)
 zlocs = np.linspace(0, 300, len(AT))
@@ -21,7 +21,7 @@ zlocs = np.linspace(0, 300, len(AT))
 #%%
 
 plotcmap(sim, fibra, zlocs, AT, AW, legacy=False, dB=True, wavelength=True,
-         vlims=[-20,50,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
+         vlims=[-30,0,-60,0], Tlim=[-25,25], Wlim=[1400,1700], zeros=True, cmap="turbo")
 
 plotinst(sim, fibra, AT, AW, wavelength=True)
 

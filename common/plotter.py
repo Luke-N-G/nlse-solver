@@ -207,8 +207,8 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
     
     #Escala dB
     if dB:
-        P_T = 20*np.log10(P_T)
-        P_W = 20*np.log10(P_W)
+        P_T = 10*np.log10(P_T) - np.max( 10*np.log10(P_T) )
+        P_W = 10*np.log10(P_W) - np.max( 10*np.log10(P_W) )
         
     #Limites del colorbar
     if vlims:
@@ -240,10 +240,10 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
         ax1.set_xlabel("Time (ps)", size=m_label_size)
         ax1.set_title("Pulse", size=M_label_size)
         #Colorbar 1: Es interactivo
-        cbar1 = fig.colorbar(im1, ax=ax1, label='$|A|^2$', location="bottom", aspect=50 )
+        cbar1 = fig.colorbar(im1, ax=ax1, label='Normalized power (dB)', location="bottom", aspect=50 )
         cbar1.ax.tick_params(labelsize=cbar_tick_size)
-        if dB: #Si dB == True, ajustamos los ticks al formato 10^x (interactuar con esto lo rompe)
-            cbar1.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
+        #if dB: #Si dB == True, ajustamos los ticks al formato 10^x (interactuar con esto lo rompe)
+        #    cbar1.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
         if Tlim:
             ax1.set_xlim(Tlim)        
         
@@ -255,10 +255,10 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
         ax2.tick_params(labelsize=tick_size)
         ax2.set_title("Spectrum", size=M_label_size)
         #Colorbar 2
-        cbar2 = fig.colorbar(im2, ax=ax2, label='$|\\tilde{A}|^2$', location="bottom", aspect=50 )
+        cbar2 = fig.colorbar(im2, ax=ax2, label='PSD (a.u. dB)', location="bottom", aspect=50 )
         cbar2.ax.tick_params(labelsize=cbar_tick_size)
-        if dB:
-            cbar2.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
+        #if dB:
+        #    cbar2.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
             
         if zeros:
             freq_zdw = (fib.omega0 - fib.w_zdw)/(2*np.pi)
