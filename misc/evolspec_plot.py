@@ -108,7 +108,7 @@ cbar_tick_size = 16
 tick_size      = 16
 m_label_size   = 16
 M_label_size   = 15
-cmap = "turbo"
+cmap = "magma"
 
 Tlim = [-25,25]
 Wlim_s = [-25,25]

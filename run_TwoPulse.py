@@ -44,14 +44,14 @@ offset_1 = 0
 
 
 #Parámetros pulso 2:
-Lambda2  = 1480
-amp_2    = 30
-ancho_2  = 5750e-3
+Lambda2  = 1500
+amp_2    = 20
+ancho_2  = 3000e-3
 offset_2 = 20 
 
 
 #Parametros para la fibra
-L     = 300                   #Lfib:   m
+L     = 500                   #Lfib:   m
 b2    = -4.4e-3*1                  #Beta2:  ps^2/km
 b3    = 0.13e-3*1                  #Beta3:  ps^3/km
 gam   = 2.5e-3*1                   #Gamma:  1/Wkm
@@ -61,8 +61,8 @@ w_znw = 2*np.pi*c/lambda_znw
 gam1 = -gam/(w_znw - omega0)*1
 
 alph  = 0                        #alpha:  dB/m
-TR    = 3e-3*1                   #TR:     fs
-fR    = 0.18*1                   #fR:     adimensional (0.18)
+TR    = 3e-3*0                   #TR:     fs
+fR    = 0.18*0                   #fR:     adimensional (0.18)
 
 #Diferencia de frecuencias
 nu2     = c/Lambda2
@@ -83,14 +83,14 @@ pulso = Two_Pulse(sim.tiempo, amp_1, amp_2, ancho_1, ancho_2, offset_1, offset_2
 
 #---pcgNLSE---
 t0 = time.time()
-zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=300, tau1=4e-3)
+zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulso, z_locs=300)
 t1 = time.time()
 
 total_n = t1 - t0 #Implementar en Solve_pcGNLSE
 print("Time",np.round(total_n/60,2),"(min)")
 chime.success()
 
-#saver(AW, AT, sim, fibra, "save_test", f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
+saver(AW, AT, sim, fibra, "recoil", f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
 
 
 #%%
@@ -102,7 +102,7 @@ plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 plotspecgram(sim, fibra, AT, zeros=True)
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
-          vlims=[-20,50,0,120], zeros=True,plot_type="both")
+          vlims=[-30,0,-30,0], zeros=True,plot_type="both")
 
 #%% Extra1
 
@@ -165,7 +165,7 @@ def find_reflection_manual(fib:Fibra, lambda_i, beta1_s):
 
 reflection = np.zeros_like(zlocs)
 reflection_zd = np.zeros_like(zlocs)
-for i in range(len(zlocs)):
+for i in range(len(zlocs)-1):
     reflection[i] = find_reflection_manual(fibra, 1500, vgs[i])[1]
     reflection_zd[i] = find_reflection_manual(fibra, 1500, vgs_zd[i])[1]
 
