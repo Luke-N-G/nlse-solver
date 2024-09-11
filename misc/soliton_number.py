@@ -8,7 +8,7 @@ Created on Thr Aug 22 10:10:32 2024
 #%% Imports
 
 import numpy as np
-from common.commonfunc import ReSim, FT, IFT, fftshift, Pot, Fibra, Sim, Adapt_Vector
+from common.commonfunc import ReSim, FT, IFT, fftshift, Pot, Fibra, Sim, Adapt_Vector, loader
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 import pickle
@@ -303,31 +303,6 @@ def plot_soliton_matrix2(N, P, T, cmap="viridis", tick_labels_size=10, tick_labe
     plt.grid(True, alpha=0.3, which='both')
     plt.show()
 
-#%% Testeo individual
-
-savedic = "soliton_gen/firstsweep/"
-
-AW, sim, fibra = modloader(savedic+"67", resim=True)
-AT = IFT(AW)
-zlocs = np.linspace(0,300,100)
-
-plotcmap(sim, fibra, zlocs, AT, AW, legacy=False, dB=True, wavelength=True,
-         vlims=[-20,70,0,120], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
-
-plt.figure()
-plt.plot(sim.tiempo, Pot(AT)[-1])
-plt.grid(True,alpha=.3)
-plt.xlabel("Time (ps)")
-plt.ylabel("Peak power (W)")
-plt.xlim([-25,25])
-plt.show()
-
-n = soliton_number(fibra, sim, AW, z_index = -1, plot_fits=True)
-print(n)
-
-z_indices = range(50, len(AW))  # or any other range of z indices you want to test
-max_count = max_soliton_count(fibra, sim, AW, z_indices)
-print(f"Maximum number of solitons: {max_count}")
 
 
 #%% Uso sobre todos los datos
@@ -370,5 +345,30 @@ for i,j in enumerate(test_N): #range(1,19):
     plt.xlim([0.3,8.2])
 legcmap = plt.get_cmap("YlGnBu_r")
 legend = plt.legend(loc="lower left")
+
+#%% Testeo individual
+
+savedic = "soliton_gen/"
+
+AW, AT, sim, fibra = loader(savedic+"sgm", resim=True)
+zlocs = np.linspace(0,300,100)
+
+plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,
+         vlims=[-30,0,-50,0], Tlim=[-25,25], Wlim=[1400,1700], zeros=True)
+
+plt.figure()
+plt.plot(sim.tiempo, Pot(AT)[-1])
+plt.grid(True,alpha=.3)
+plt.xlabel("Time (ps)")
+plt.ylabel("Peak power (W)")
+plt.xlim([-25,25])
+plt.show()
+
+n = soliton_number(fibra, sim, AW, z_index = -1, plot_fits=True)
+print(n)
+
+z_indices = range(50, len(AW))  # or any other range of z indices you want to test
+max_count = max_soliton_count(fibra, sim, AW, z_indices)
+print(f"Maximum number of solitons: {max_count}")
 
 

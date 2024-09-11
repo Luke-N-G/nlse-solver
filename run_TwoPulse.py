@@ -44,25 +44,25 @@ offset_1 = 0
 
 
 #Parámetros pulso 2:
-Lambda2  = 1500
-amp_2    = 20
-ancho_2  = 3000e-3
+Lambda2  = 1480
+amp_2    = 30
+ancho_2  = 5750e-3
 offset_2 = 20 
 
 
 #Parametros para la fibra
-L     = 500                   #Lfib:   m
+L     = 300                   #Lfib:   m
 b2    = -4.4e-3*1                  #Beta2:  ps^2/km
 b3    = 0.13e-3*1                  #Beta3:  ps^3/km
 gam   = 2.5e-3*1                   #Gamma:  1/Wkm
 
-lambda_znw = 1650
+lambda_znw = 1470
 w_znw = 2*np.pi*c/lambda_znw
 gam1 = -gam/(w_znw - omega0)*1
 
 alph  = 0                        #alpha:  dB/m
-TR    = 3e-3*0                   #TR:     fs
-fR    = 0.18*0                   #fR:     adimensional (0.18)
+TR    = 3e-3*1                   #TR:     fs
+fR    = 0.18*1                   #fR:     adimensional (0.18)
 
 #Diferencia de frecuencias
 nu2     = c/Lambda2
@@ -90,7 +90,7 @@ total_n = t1 - t0 #Implementar en Solve_pcGNLSE
 print("Time",np.round(total_n/60,2),"(min)")
 chime.success()
 
-saver(AW, AT, sim, fibra, "recoil", f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
+#saver(AW, AT, sim, fibra, "1470", f'{[Lambda1, amp_1, ancho_1, offset_1, Lambda2, amp_2, ancho_2, offset_2] = }')
 
 
 #%%

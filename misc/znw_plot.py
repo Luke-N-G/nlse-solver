@@ -17,13 +17,13 @@ from functools import partial
 #Time
 import time
 
-AW, AT, sim, fibra = loader("soliton_gen/1450", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/1470", resim = True)
 zlocs = np.linspace(0, 300, len(AT))
 
 
 #%% Plotting
 
-plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,cmap="turbo",
+plotcmap(sim, fibra, zlocs, AT, AW, legacy=True, dB=True, wavelength=True,cmap="magma",
          vlims=[-30,0,-60,0], Tlim=[-50,50], Wlim=[1400,1700], zeros=True, plot_type="both")
 
 
@@ -38,7 +38,7 @@ lambda_znw_1650 = 1650
 w_znw1650 = 2*np.pi*c/lambda_znw_1650
 gam1_1650 = -fibra.gamma/(w_znw1650 - omega0)*1
 
-lambda_znw_1450 = 1450
+lambda_znw_1450 = 1470
 w_znw1450 = 2*np.pi*c/lambda_znw_1450
 gam1_1450 = -fibra.gamma/(w_znw1450 - omega0)*1
 
@@ -98,8 +98,8 @@ cbar_tick_size = 15
 tick_size      = 15
 m_label_size   = 15
 M_label_size   = 15
-vlims          = [-20,60]
-cmap           = "turbo"
+vlims          = [-0,40]
+cmap           = "magma"
 Tlim           = [-40, 40]
 
 #Vectores de potencia, y listas "extent" para pasarle a imshow
