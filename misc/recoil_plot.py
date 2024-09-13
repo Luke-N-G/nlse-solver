@@ -31,6 +31,8 @@ plotspecgram2(sim, fibra, AT, Tlim=[-25,25], Wlim=[-25,25], zeros=True)
 
 #%% Busqueda de máximos, derivadas, etc
 
+c = 299792458 * (1e9)/(1e12)
+
 #Buscar posición y tiempo del máximo en AT^2
 def find_max(AT, tiempo):
     # Calculate the absolute square of AT
@@ -49,7 +51,7 @@ from scipy.interpolate import UnivariateSpline
 from scipy.signal import savgol_filter
 def compute_derivative(max_times, zlocs):
     # Fit a spline to the data
-    spline = UnivariateSpline(zlocs, max_times, k=3)  # k=3 for cubic spline
+    spline = UnivariateSpline(zlocs, max_times, k=2)  # k=3 for cubic spline
     spline.set_smoothing_factor(1)
     # Compute the derivative of the spline
     derivative = spline.derivative()
@@ -97,7 +99,7 @@ for i in range(len(zlocs)-1):
 spl = UnivariateSpline(zlocs,maxs, k =3)
 spl.set_smoothing_factor(0.02)
 
-
+reflection[-1] = reflection[-2]
 
 #%% dB Scale
 
@@ -119,7 +121,7 @@ P_T = 10*np.log10(P_T) - np.max(10*np.log10(P_T))
 # Limites del colorbar
 vmin_t = -30
 vmax_t = 0
-vmin_s = -40
+vmin_s = -50
 vmax_s = 0
 textent = [sim.tiempo[0], sim.tiempo[-1], zlocs[0], zlocs[-1]]
 

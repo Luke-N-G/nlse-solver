@@ -344,6 +344,7 @@ Ratio = Rf_v/Tr_v
 
 #%% Ploteo
 
+
 tick_size = 14
 label_size = 14
 
