@@ -342,8 +342,7 @@ N_sv = N_sv - 1
     
 Ratio = Rf_v/Tr_v
 
-#%% Ploteo
-
+#%% Ploteo (Con número de solitones)
 
 tick_size = 14
 label_size = 14
@@ -367,3 +366,53 @@ ax2.tick_params(axis='y', labelcolor=color, labelsize=tick_size)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
+
+#%% Ploteo sin solitones
+
+
+def Raman_graph(T,tau1,tau2):
+    hR = np.zeros( len(T) )
+    hR[T>=0] = (tau1**2+tau2**2)/(tau1*tau2**2) * np.exp(-T[T>=0]/tau2) * np.sin(T[T>=0]/tau1) #Definimos el hR(T)
+    hR[T<0]  = 0
+    
+    hR = fftshift(hR)  #Shifteamos para que la respuesta empiece al principio de la ventana temporal
+    hR = hR/np.sum(hR) #Normalizamos, tal que int(hR) = 1    
+    hR_W = FT(hR)      #Pasamos el hR_W a frecuencia
+    
+    return hR_W
+
+taus = [1, 0.014, 0.008]
+gR_tau = np.zeros(len(taus), dtype=object)
+for i in range(len(taus)):
+    gR_tau[i] = np.imag( Raman_graph(sim.tiempo, taus[i], 32e-3) )
+    gR_tau[i][sim.freq<=0] = 0
+    
+
+
+#%%
+
+tick_size = 14
+label_size=14
+
+fig, ax1 = plt.subplots()
+
+color = 'blue'
+ax1.set_xlabel("Maximum gain frequency (THz)", size=label_size)
+ax1.set_ylabel("$E_R/E_T$", size=label_size)
+ax1.plot(freq_vec, Ratio, color=color)
+ax1.tick_params(axis='y', labelsize=tick_size)
+ax1.tick_params(axis="x", labelsize=tick_size)
+for i in gR_tau:
+    plt.plot( fftshift(sim.freq), fftshift( i )/(np.max(i))*3, color="gray" )
+plt.xlim([0,30])
+fig.tight_layout()
+plt.show()
+
+
+#%%
+
+hR_W = Raman_graph(sim.tiempo, tau1=1.3, tau2=32e-3)
+
+plt.plot(fftshift(sim.freq), fftshift(np.imag(hR_W)))
+plt.xlim([0,30])
+
