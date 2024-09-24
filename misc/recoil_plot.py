@@ -111,7 +111,7 @@ M_label_size   = 15
 cmap = "magma"
 
 Tlim = [-20,10]
-Wlim = [1470,1670]
+Wlim = [1470,1680]
 
 P_T = Pot(AT)
 
@@ -158,17 +158,18 @@ P_W = 10*np.log10(P_W) - np.max( 10*np.log10(P_W) )
 im2 = ax2.imshow(P_W, cmap=cmap, aspect="auto", interpolation='bilinear', origin="lower",
                  extent=wextent, vmin=vmin_s, vmax=vmax_s)
 ax2.plot(reflection, zlocs, "--w", linewidth=3)
+ax2.set_xticks([1500,1550,1600,1650])
 ax2.tick_params(labelsize=tick_size)
 #Colorbar 2
 cbar2 = fig.colorbar(im2, ax=ax2, label='PSD (a.u. dB)', location="bottom", aspect=20 )
-cbar2.set_label('PSD (a.u. dB)', size=m_label_size)
+cbar2.set_label('PSD (a.u., dB)', size=m_label_size)
 cbar2.ax.tick_params(labelsize=cbar_tick_size)
 
 freq_zdw = (fibra.omega0 - fibra.w_zdw)/(2*np.pi)
 freq_znw = (fibra.omega0 - fibra.w_znw)/(2*np.pi)
 
-ax2.axvline(x = fibra.zdw, linestyle="--", color="blue",  label="ZDW")
-ax2.axvline(x = fibra.znw, linestyle="--", color="crimson", label="ZNW")
+ax2.axvline(x = fibra.zdw, linestyle="-.", color="dodgerblue",  label="ZDW", linewidth=2)
+ax2.axvline(x = fibra.znw, linestyle="--", color="crimson", label="ZNW", linewidth=2)
 
 plt.legend(loc="best")
 

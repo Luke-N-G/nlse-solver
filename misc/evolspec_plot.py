@@ -81,7 +81,7 @@ vmin_s = vmax_s + vmin_t
 im2.set_clim(vmin=vmin_s, vmax=vmax_s)
 
 freq_zdw = (fibra.omega0 - fibra.w_zdw) / (2 * np.pi)
-ax2.plot(xextent, [freq_zdw, freq_zdw], "--", color="blue", linewidth=2, label="ZDW = " + str(round(fibra.zdw)) + " nm")
+ax2.plot(xextent, [freq_zdw, freq_zdw], "-.", color="dodgerblue", linewidth=2, label="ZDW = " + str(round(fibra.zdw)) + " nm")
 
 freq_znw = (fibra.omega0 - fibra.w_znw) / (2 * np.pi)
 ax2.plot(xextent, [freq_znw, freq_znw], "--", color="red", linewidth=2, label="ZNW = " + str(round(fibra.znw)) + " nm")
@@ -151,10 +151,10 @@ vmin_s = vmax_s + vmin_t
 im2.set_clim(vmin=vmin_s, vmax=vmax_s)
 
 freq_zdw = (fibra.omega0 - fibra.w_zdw) / (2 * np.pi)
-ax2.plot(xextent, [freq_zdw, freq_zdw], "--", color="blue", linewidth=2, label="ZDW @ " + str(round(fibra.zdw)) + " nm")
+ax2.plot(xextent, [freq_zdw, freq_zdw], "-.", color="dodgerblue", linewidth=2.5, label="ZDW @ " + str(round(fibra.zdw)) + " nm")
 
 freq_znw = (fibra.omega0 - fibra.w_znw) / (2 * np.pi)
-ax2.plot(xextent, [freq_znw, freq_znw], "--", color="red", linewidth=2, label="ZNW @ " + str(round(fibra.znw)) + " nm")
+ax2.plot(xextent, [freq_znw, freq_znw], "--", color="red", linewidth=2.5, label="ZNW @ " + str(round(fibra.znw)) + " nm")
 ax2.legend(loc="best", prop={'size': 12})
 
 ax2.set_xlabel("Time (ps)", size=m_label_size)

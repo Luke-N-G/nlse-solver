@@ -382,9 +382,9 @@ def Raman_graph(T,tau1,tau2):
     return hR_W
 
 taus = [1, 0.014, 0.008]
-gR_tau = np.zeros(len(taus), dtype=object)
-for i in range(len(taus)):
-    gR_tau[i] = np.imag( Raman_graph(sim.tiempo, taus[i], 32e-3) )
+gR_tau = np.zeros(len(tau1_vec), dtype=object)
+for i in range(len(tau1_vec)):
+    gR_tau[i] = np.imag( Raman_graph(sim.tiempo, tau1_vec[i], 32e-3) )
     gR_tau[i][sim.freq<=0] = 0
     
 
@@ -396,15 +396,21 @@ label_size=14
 
 fig, ax1 = plt.subplots()
 
-color = 'blue'
-ax1.set_xlabel("Maximum gain frequency (THz)", size=label_size)
+color = 'black'
+ax1.set_xlabel("Raman peak (THz)", size=label_size)
 ax1.set_ylabel("$E_R/E_T$", size=label_size)
-ax1.plot(freq_vec, Ratio, color=color)
+ax1.plot(freq_vec, Ratio, color=color, linewidth=2)
 ax1.tick_params(axis='y', labelsize=tick_size)
 ax1.tick_params(axis="x", labelsize=tick_size)
-for i in gR_tau:
-    plt.plot( fftshift(sim.freq), fftshift( i )/(np.max(i))*3, color="gray" )
+
+cmap = plt.get_cmap('Greys_r')
+j=0
+for i in gR_tau[0:20:2]:
+    color = cmap( j/(len( gR_tau[0:20:2]) ) )
+    plt.plot( fftshift(sim.freq), fftshift( i )/(np.max(i))*3, color=color , alpha=.4)
+    j+=1
 plt.xlim([0,30])
+plt.ylim([0,10])
 fig.tight_layout()
 plt.show()
 
