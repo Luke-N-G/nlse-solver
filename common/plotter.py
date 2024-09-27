@@ -207,8 +207,8 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
     
     #Escala dB
     if dB:
-        P_T = 10*np.log10(P_T) - np.max( 10*np.log10(P_T) )
-        P_W = 10*np.log10(P_W) - np.max( 10*np.log10(P_W) )
+        P_T = 10*np.log10(P_T) - np.max( 10*np.log10(P_T[0]) )
+        P_W = 10*np.log10(P_W) - np.max( 10*np.log10(P_W[0]) )
         
     #Limites del colorbar
     if vlims:
