@@ -139,13 +139,13 @@ meta_atom = soliton*np.exp(-1j*f1*sim.tiempo) + small_p*np.exp(-1j*f2*sim.tiempo
 
 #Pulso dispersivo
 
-amp    = 1
+amp    = 10
 ancho  = 2
 offset = 5
 lam_d    = 1540
 freq   = fibra.lambda_to_omega(lam_d)
 
-d_pulse = np.sqrt(amp)*(1/np.cosh(sim.tiempo + offset/ancho))*np.exp(-1j*freq*sim.tiempo)
+d_pulse = np.sqrt(amp)*(1/np.cosh((sim.tiempo + offset)/ancho))*np.exp(-1j*freq*sim.tiempo)
 
 meta_atom_d = meta_atom + d_pulse
 

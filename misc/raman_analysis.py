@@ -405,9 +405,9 @@ ax1.tick_params(axis="x", labelsize=tick_size)
 
 cmap = plt.get_cmap('Greys_r')
 j=0
-for i in gR_tau[0:20:2]:
-    color = cmap( j/(len( gR_tau[0:20:2]) ) )
-    plt.plot( fftshift(sim.freq), fftshift( i )/(np.max(i))*3, color=color , alpha=.4)
+for i in gR_tau[10:26:3]:
+    color = cmap( j/(len( gR_tau[10:26:3])  ) )
+    plt.plot( fftshift(sim.freq), fftshift( i )/(np.max(i))*3, color=color , alpha=1)
     j+=1
 plt.xlim([0,30])
 plt.ylim([0,10])
