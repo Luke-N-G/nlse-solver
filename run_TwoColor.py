@@ -36,7 +36,7 @@ Lambda0= 1555                    #Longitud de onda central (nm)
 omega0 = 2*np.pi*c/Lambda0
 
 #Parametros para la fibra
-L     = 150                         #Lfib:   m
+L     = 1000                         #Lfib:   m
 b2    = 1e-3                  #Beta2:  ps^2/km
 b3    = 0               #Beta3:  ps^3/km
 b4    = -1*1e-6
@@ -72,10 +72,10 @@ z0 = np.pi/2 * t0**2/fibra.betas[0]
 
 #%% Parámetros pulso dispersivo
 
-amp    = 10
+amp    = 80
 ancho  = 1
 offset = 5
-lam_d    = 1513
+lam_d    = 1540
 freq   = fibra.lambda_to_omega(lam_d)
 
 d_pulse = np.sqrt(amp)*(1/np.cosh(sim.tiempo + offset/ancho))*np.exp(-1j*freq*sim.tiempo)
@@ -85,11 +85,11 @@ m_d = molecule + d_pulse
 #%% Corriendo el código
 
 #---NLSE molecule---
-t0 = time.time()
+time_0 = time.time()
 zlocs, AW, AT = SolveNLS(sim, fibra, m_d, z_locs=300, raman=False, pbar=True)
-t1 = time.time()
+time_1 = time.time()
 
-total_n = t1 - t0 #Implementar en Solve_pcGNLSE
+total_n = time_1 - time_0 #Implementar en Solve_pcGNLSE
 print("Fiber 1 DONE. Time",np.round(total_n/60,2),"(min)")
 chime.success()
 
@@ -98,6 +98,9 @@ chime.success()
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-20,20],
           vlims=[-30,0,-30,0], zeros=False)
 
+#%% Save
+
+saver(AW, AT, sim, fibra, "twocolor/1540nm", f'{[lam_d, amp, ancho, offset, t0] = }')
 
 #%% EXTRAS
 
