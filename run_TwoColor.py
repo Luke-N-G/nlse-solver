@@ -72,7 +72,7 @@ z0 = np.pi/2 * t0**2/fibra.betas[0]
 
 #%% Parámetros pulso dispersivo
 
-amp    = 80
+amp    = 30
 ancho  = 1
 offset = 5
 lam_d    = 1540
@@ -80,7 +80,8 @@ freq   = fibra.lambda_to_omega(lam_d)
 
 d_pulse = np.sqrt(amp)*(1/np.cosh(sim.tiempo + offset/ancho))*np.exp(-1j*freq*sim.tiempo)
 
-m_d = molecule + d_pulse
+
+m_d = molecule + d_pulse 
 
 #%% Corriendo el código
 
@@ -100,9 +101,69 @@ plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-20,20],
 
 #%% Save
 
-saver(AW, AT, sim, fibra, "twocolor/1540nm", f'{[lam_d, amp, ancho, offset, t0] = }')
+saver(AW, AT, sim, fibra, "twocolor/twocollision", f'{[lam_d, amp, ancho, offset, t0] = }')
 
-#%% EXTRAS
+#%% EXTRAS 1: Meta-atom
+
+#Parametros para la fibra
+L_m     = 800                         #Lfib:   m
+b2_m    = 1e-3                  #Beta2:  ps^2/km
+b3_m    = 0               #Beta3:  ps^3/km
+b4_m    = -1*1e-6
+betas_m = [b2,b3,b4]
+gam_m   = 1.4e-3                  #Gamma:  1/Wkm
+gam1_m = 0
+alph_m  = 0                        #alpha:  dB/m
+TR_m    = 0                   #TR:     fs
+fR_m    = 0                   #fR:     adimensional (0.18)
+
+#Cargo objetos con los parámetros:
+sim    = Sim(N, Tmax)
+fibra_m  = Fibra(L=L_m, beta2=b2_m, beta3=b3_m, gamma=gam_m, gamma1=gam1_m, betas=betas_m, alpha=alph_m, lambda0=Lambda0, TR = TR_m, fR = fR_m)
+
+sol_t0  = 100e-3
+sol_amp = np.abs(fibra_m.beta2_w(f1))/(fibra_m.gamma*sol_t0**2)
+
+#Frecuencias de posibles
+f1 = -np.sqrt(6*b2/np.abs(b4))
+f2 = -f1
+
+soliton = np.sqrt( sol_amp ) * 1/np.cosh(sim.tiempo/sol_t0)
+
+nu = -1/2 + (1/4 + 4 * (fibra_m.beta2_w(f1)/fibra_m.beta2_w(f2)))**(1/2)
+
+small_p = np.sqrt( 1e-5* sol_amp) * (1/np.cosh(sim.tiempo/sol_t0))**nu
+
+meta_atom = soliton*np.exp(-1j*f1*sim.tiempo) + small_p*np.exp(-1j*f2*sim.tiempo)
+
+
+#Pulso dispersivo
+
+amp    = 1
+ancho  = 2
+offset = 5
+lam_d    = 1540
+freq   = fibra.lambda_to_omega(lam_d)
+
+d_pulse = np.sqrt(amp)*(1/np.cosh(sim.tiempo + offset/ancho))*np.exp(-1j*freq*sim.tiempo)
+
+meta_atom_d = meta_atom + d_pulse
+
+#%% NLSE Meta-atom
+
+#---NLSE molecule---
+time_0 = time.time()
+zlocs_m, AW_m, AT_m = SolveNLS(sim, fibra_m, meta_atom_d, z_locs=300, raman=False, pbar=True)
+time_1 = time.time()
+
+total_n = time_1 - time_0 #Implementar en Solve_pcGNLSE
+print("Fiber 1 DONE. Time",np.round(total_n/60,2),"(min)")
+chime.success()
+
+plotcmap(sim, fibra_m, zlocs_m, AT_m, AW_m, wavelength=True, dB=True, Tlim=[-20,20],
+          vlims=[-80,0,-30,0], zeros=False)
+
+#%% EXTRA 2: Plot profile
 
 #Plot profile
 
