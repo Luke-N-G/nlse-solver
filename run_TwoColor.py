@@ -106,7 +106,7 @@ saver(AW, AT, sim, fibra, "twocolor/twocollision", f'{[lam_d, amp, ancho, offset
 #%% EXTRAS 1: Meta-atom
 
 #Parametros para la fibra
-L_m     = 800                         #Lfib:   m
+L_m     = 1000                         #Lfib:   m
 b2_m    = 1e-3                  #Beta2:  ps^2/km
 b3_m    = 0               #Beta3:  ps^3/km
 b4_m    = -1*1e-6
@@ -134,13 +134,16 @@ nu = -1/2 + (1/4 + 4 * (fibra_m.beta2_w(f1)/fibra_m.beta2_w(f2)))**(1/2)
 
 small_p = np.sqrt( 1e-5* sol_amp) * (1/np.cosh(sim.tiempo/sol_t0))**nu
 
-meta_atom = soliton*np.exp(-1j*f1*sim.tiempo) + small_p*np.exp(-1j*f2*sim.tiempo)
+#Primer excitado:
+small_p_1 = np.sqrt( 1e-5* sol_amp) * (1/np.cosh(sim.tiempo/sol_t0))**(nu-1) * np.tanh(sim.tiempo/sol_t0)
+
+meta_atom = soliton*np.exp(-1j*f1*sim.tiempo) + small_p_1*np.exp(-1j*f2*sim.tiempo)
 
 
 #Pulso dispersivo
 
-amp    = 10
-ancho  = 2
+amp    = 3
+ancho  = 1
 offset = 5
 lam_d    = 1540
 freq   = fibra.lambda_to_omega(lam_d)
@@ -161,7 +164,7 @@ print("Fiber 1 DONE. Time",np.round(total_n/60,2),"(min)")
 chime.success()
 
 plotcmap(sim, fibra_m, zlocs_m, AT_m, AW_m, wavelength=True, dB=True, Tlim=[-20,20],
-          vlims=[-80,0,-30,0], zeros=False)
+          vlims=[-30,0,-80,0], zeros=False)
 
 #%% EXTRA 2: Plot profile
 
