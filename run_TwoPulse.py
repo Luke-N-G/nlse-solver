@@ -27,8 +27,8 @@ import cmasher as cmr
 
 
 #Parametros para la simulación
-N = int(2**14) #puntos
-Tmax = 70      #ps
+N = int(2*2**14) #puntos
+Tmax = 140#70      #ps
 
 c = 299792458 * (1e9)/(1e12)
 

@@ -17,7 +17,7 @@ from functools import partial
 #Time
 import time
 
-AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/1470_2", resim = True)
 zlocs = np.linspace(0, 300, len(AT))
 
 
@@ -110,13 +110,13 @@ m_label_size   = 16
 M_label_size   = 15
 cmap = "magma"
 
-Tlim = [-25,25]
+Tlim = [-40,120]
 Wlim_s = [-25,25]
 
 P_T = Pot(AT)
 
 # Escala dB
-P_T = 10*np.log10(P_T) - np.max(10*np.log10(P_T))
+P_T = 10*np.log10(P_T) - np.max(10*np.log10(P_T[0]))
 
 # Limites del colorbar
 vmin_t = -30
@@ -155,7 +155,7 @@ ax2.plot(xextent, [freq_zdw, freq_zdw], "-.", color="dodgerblue", linewidth=2.5,
 
 freq_znw = (fibra.omega0 - fibra.w_znw) / (2 * np.pi)
 ax2.plot(xextent, [freq_znw, freq_znw], "--", color="red", linewidth=2.5, label="ZNW @ " + str(round(fibra.znw)) + " nm")
-ax2.legend(loc="best", prop={'size': 12})
+ax2.legend(loc="upper left", prop={'size': 12})
 
 ax2.set_xlabel("Time (ps)", size=m_label_size)
 ax2.set_ylabel("Frequency (THz)", size=m_label_size)
