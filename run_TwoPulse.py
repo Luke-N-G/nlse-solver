@@ -27,8 +27,8 @@ import cmasher as cmr
 
 
 #Parametros para la simulación
-N = int(2*2**14) #puntos
-Tmax = 140#70      #ps
+N = int(2**14) #puntos
+Tmax = 70      #ps
 
 c = 299792458 * (1e9)/(1e12)
 
@@ -45,7 +45,7 @@ offset_1 = 0
 
 #Parámetros pulso 2:
 Lambda2  = 1480
-amp_2    = 30
+amp_2    = 20#30
 ancho_2  = 5750e-3
 offset_2 = 20 
 
@@ -56,13 +56,13 @@ b2    = -4.4e-3*1                  #Beta2:  ps^2/km
 b3    = 0.13e-3*1                  #Beta3:  ps^3/km
 gam   = 2.5e-3*1                   #Gamma:  1/Wkm
 
-lambda_znw = 1470
+lambda_znw = 1650
 w_znw = 2*np.pi*c/lambda_znw
 gam1 = -gam/(w_znw - omega0)*1
 
 alph  = 0                        #alpha:  dB/m
-TR    = 3e-3*1                   #TR:     fs
-fR    = 0.18*1                   #fR:     adimensional (0.18)
+TR    = 3e-3*0                   #TR:     fs
+fR    = 0.18*0                   #fR:     adimensional (0.18)
 
 #Diferencia de frecuencias
 nu2     = c/Lambda2
@@ -102,7 +102,7 @@ plotinst(sim, fibra, AT, AW, dB=False, wavelength=True, zeros=True, end=210)
 plotspecgram(sim, fibra, AT, zeros=True)
 
 plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-30,30], Wlim=[1400,1700],
-          vlims=[-30,0,-30,0], zeros=True,plot_type="both")
+          vlims=[-30,0,-30,0], zeros=True,plot_type="both", cmap="magma")
 
 #%% Extra1
 
