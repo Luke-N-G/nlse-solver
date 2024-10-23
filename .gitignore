@@ -14,3 +14,4 @@ run_loop_bizero.py
 soliton_gen/
 soliton_number.py
 twocolor/
+run_pcTwoColor.py
