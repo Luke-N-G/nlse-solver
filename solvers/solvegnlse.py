@@ -71,7 +71,7 @@ def SolveNLS(sim: Sim, fib: Fibra, pulso_0, raman=False, z_locs=None, pbar=True)
                 def dBdz_with_progress(z, B):
                     pbar.update(abs(z - dBdz_with_progress.prev_z))
                     dBdz_with_progress.prev_z = z
-                    return dBdz_raman(z, B, D = D_w, w = 2*np.pi*sim.freq, gamma = fib.gamma, RW = RW)
+                    return dBdz_raman(z, B, D = D_w, w = 2*np.pi*sim.freq, gamma = fib.gamma, gamma1 = fib.gamma1, RW = RW)
                 dBdz_with_progress.prev_z = 0
             else:
                 def dBdz_with_progress(z, B):
