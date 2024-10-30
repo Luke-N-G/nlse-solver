@@ -24,7 +24,18 @@ def dBdz(z,B,D,w,gamma,heavi):
     return np.exp(-D*z) * op_nolin
 
 
-
+""" SOLVE_BARRIERNLSE
+Solve_barrierNLSE: Función para simular la evolución con la NLSE, pero considerando un cambio
+de índice de refracción temporal, modelado a través de una función de Heaviside
+sim:         Parámetros de la simulación
+fib:         Parámetros de la fibra
+pulso_0:     Pulso de entrada
+delta_beta1: Diferencia de beta 1 entre el pulso incidente y la pared
+TB:          Tiempo correspondiente al cambio de índice de refracción
+betab:       Altura de la pared
+z_locs:      Int, opcional. En cuantos puntos de z (entre 0 y L) se requiere la solución. 
+pbar:        Booleano, por defecto True. Barra de progreso de la simulación.
+"""
 def Solve_barrierNLSE(sim: Sim, fib: Fibra, pulso_0, delta_beta1, TB, betab, z_locs=None, pbar=True):
     #Calculamos el espectro inicial, es lo que vamos a evolucionar.
     espectro_0 = FT(pulso_0)

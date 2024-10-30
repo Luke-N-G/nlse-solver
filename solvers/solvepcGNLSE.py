@@ -38,7 +38,15 @@ def Raman(T, tau1=12.2e-3, tau2=32e-3, fR=0.18): #Agrawal pag.38: t1 = 12.2s fs,
 
     return hR_W
 
-
+""" SOLVE_PCGNLSE
+solve_pcGNLSE: Función para simular la evolución con la NLSE
+sim:           Parámetros de la simulación
+fib:           Parámetros de la fibra
+pulso_0:       Pulso de entrada
+raman:         Booleano, por defecto False. Si False, se usa aproximación de pulso ancho, si True respuesta completa.
+z_locs:        Int, opcional. En cuantos puntos de z (entre 0 y L) se requiere la solución. 
+pbar:          Booleano, por defecto True. Barra de progreso de la simulación.
+"""
 def Solve_pcGNLSE(sim: Sim, fib: Fibra, pulso_0, z_locs=None, tau1=12.2e-3, pbar=True):
     
     #Calculamos el espectro inicial, es lo que vamos a evolucionar.
