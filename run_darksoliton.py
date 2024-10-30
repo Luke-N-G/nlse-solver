@@ -159,7 +159,7 @@ Lambda0_a= 1600#1550                       #Longitud de onda central (nm)
 omega0_a = 2*np.pi*c/Lambda0
 
 #Parametros para la fibra
-L_a     = 40                      #Lfib:   m
+L_a     = 40*1e-5                      #Lfib:   m
 b2_a    = 1                 #Beta2:  ps^2/km
 b3_a    = 0.15                  #Beta3:  ps^3/km
 gam_a   = 1                   #Gamma:  1/Wkm
