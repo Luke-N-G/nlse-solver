@@ -20,7 +20,14 @@ def dBdz(z, B, D, w, gammaw_eff, r, r_c): #Todo lo que esta del lado derecho de 
     
     return np.exp(-D*z) * op_nolin
 
-
+""" SOLVE_PCNLSE
+solve_pcNLSE: Función para simular la evolución con la pcNLSE
+sim:          Parámetros de la simulación
+fib:          Parámetros de la fibra
+pulso_0:      Pulso de entrada
+raman:        Booleano, por defecto False. Si False, se usa aproximación de pulso ancho, si True respuesta completa.
+z_locs:       Int, opcional. En cuantos puntos de z (entre 0 y L) se requiere la solución. 
+"""
 def Solve_pcNLSE(sim: Sim, fib: Fibra, pulso_0, z_locs=None):
     #Calculamos el espectro inicial, es lo que vamos a evolucionar.
     espectro_0 = FT(pulso_0)

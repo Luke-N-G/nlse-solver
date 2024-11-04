@@ -240,7 +240,7 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
         ax1.set_xlabel("Time (ps)", size=m_label_size)
         ax1.set_title("Pulse", size=M_label_size)
         #Colorbar 1: Es interactivo
-        cbar1 = fig.colorbar(im1, ax=ax1, label='Normalized power (dB)', location="bottom", aspect=50 )
+        cbar1 = fig.colorbar(im1, ax=ax1, label='Normalized power (dB)' if dB else 'Power (W)', location="bottom", aspect=50 )
         cbar1.ax.tick_params(labelsize=cbar_tick_size)
         #if dB: #Si dB == True, ajustamos los ticks al formato 10^x (interactuar con esto lo rompe)
         #    cbar1.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))
@@ -255,7 +255,7 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
         ax2.tick_params(labelsize=tick_size)
         ax2.set_title("Spectrum", size=M_label_size)
         #Colorbar 2
-        cbar2 = fig.colorbar(im2, ax=ax2, label='PSD (a.u. dB)', location="bottom", aspect=50 )
+        cbar2 = fig.colorbar(im2, ax=ax2, label='PSD (a.u. dB)' if dB else "PSD (a.u.)", location="bottom", aspect=50 )
         cbar2.ax.tick_params(labelsize=cbar_tick_size)
         #if dB:
         #    cbar2.ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_func))

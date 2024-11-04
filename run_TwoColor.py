@@ -37,9 +37,9 @@ omega0 = 2*np.pi*c/Lambda0
 
 #Parametros para la fibra
 L     = 1000                         #Lfib:   m
-b2    = 1e-3                  #Beta2:  ps^2/km
+b2    = -1e-3                  #Beta2:  ps^2/km
 b3    = 0               #Beta3:  ps^3/km
-b4    = -1*1e-6
+b4    = 1*1e-6
 betas = [b2,b3,b4]
 gam   = 1.4e-3                  #Gamma:  1/Wkm
 gam1 = 0
@@ -60,28 +60,42 @@ def TwoColor(fib:Fibra, sim:Sim, t0):
     return A
 
 #Frecuencias de la molécula
-f1 = -np.sqrt(6*b2/np.abs(b4))
+f1 = -np.sqrt(6*np.abs(b2)/np.abs(b4))
 f2 = -f1
 
-t0 = 100e-3
+t0 = 0.09#500e-3
 
 molecule = TwoColor(fibra, sim, t0)
 molecule_spectrum = FT(molecule)
 
 z0 = np.pi/2 * t0**2/fibra.betas[0]
 
+#%% Dark soliton
+
+def simple_ds(time, beta2, gamma, width, maxwindow):
+    u = np.sqrt(np.abs(beta2)/(gamma * width**2))
+    squarewell_factor = maxwindow/width - 10
+    return u * np.tanh(time/width) * SuperGauss(time,1,width*squarewell_factor,0,0,50)
+
+darksol = simple_ds(sim.tiempo, fibra.beta2_w(f1), fibra.gamma_w(f1), width=t0, maxwindow=Tmax)*np.exp(-1j*f1*sim.tiempo)
+
+
 #%% Parámetros pulso dispersivo
 
-amp    = 30
-ancho  = 1
-offset = 5
+amp    = 2
+ancho  = 0.5
+offset = 1.5
 lam_d    = 1540
-freq   = fibra.lambda_to_omega(lam_d)
+#freq   = fibra.lambda_to_omega(lam_d)
+f_d    = f2+1.5
 
-d_pulse = np.sqrt(amp)*(1/np.cosh(sim.tiempo + offset/ancho))*np.exp(-1j*freq*sim.tiempo)
+d_pulse = np.sqrt(amp)*(1/np.cosh( (sim.tiempo + offset)/ancho))*np.exp(-1j*f_d*sim.tiempo)
 
+soliton = Soliton(sim.tiempo, t0, fibra.beta2, fibra.gamma, 1)#*np.exp(-1j*f1*sim.tiempo)
 
-m_d = molecule + d_pulse 
+m_d = darksol + d_pulse#soliton + d_pulse
+
+#m_d = molecule + d_pulse 
 
 #%% Corriendo el código
 
@@ -96,12 +110,16 @@ chime.success()
 
 #%% Plots
 
-plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-20,20],
-          vlims=[-30,0,-30,0], zeros=False)
+#plotcmap(sim, fibra, zlocs, AT, AW, wavelength=True, dB=True, Tlim=[-20,20],
+#          vlims=[-30,0,-30,0], zeros=False, cmap="magma_r")
+
+plotcmap(sim, fibra, zlocs, AT, AW, dB=True, cmap="RdBu", vlims=[-3.5,-0.9,-20,-80], Tlim=[-3,3], Wlim=[-20,20])
+
+plotcmap(sim, fibra, zlocs, AT, AW, dB=False, cmap="RdBu", vlims=[140,175, 10000,50000], Tlim=[-3,3], Wlim=[11,16])
 
 #%% Save
 
-saver(AW, AT, sim, fibra, "twocolor/twocollision", f'{[lam_d, amp, ancho, offset, t0] = }')
+#saver(AW, AT, sim, fibra, "twocolor/twocollision", f'{[lam_d, amp, ancho, offset, t0] = }')
 
 #%% EXTRAS 1: Meta-atom
 

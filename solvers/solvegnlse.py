@@ -38,7 +38,15 @@ def Raman(T, tau1=12.2e-3, tau2=32e-3, fR=0.18): #Agrawal pag.38: t1 = 12.2s fs,
     R_W = fR * hR_W + (1-fR)*np.ones( len(T) )
     return R_W
 
-
+""" SOLVENLS
+solveNLS: Función para simular la evolución con la NLSE
+sim:      Parámetros de la simulación
+fib:      Parámetros de la fibra
+pulso_0:  Pulso de entrada
+raman:    Booleano, por defecto False. Si False, se usa aproximación de pulso ancho, si True respuesta completa.
+z_locs:   Int, opcional. En cuantos puntos de z (entre 0 y L) se requiere la solución. 
+pbar:     Booleano, por defecto True. Barra de progreso de la simulación.
+"""
 def SolveNLS(sim: Sim, fib: Fibra, pulso_0, raman=False, z_locs=None, pbar=True):
 
     #Calculamos el espectro inicial, es lo que vamos a evolucionar.
@@ -71,7 +79,7 @@ def SolveNLS(sim: Sim, fib: Fibra, pulso_0, raman=False, z_locs=None, pbar=True)
                 def dBdz_with_progress(z, B):
                     pbar.update(abs(z - dBdz_with_progress.prev_z))
                     dBdz_with_progress.prev_z = z
-                    return dBdz_raman(z, B, D = D_w, w = 2*np.pi*sim.freq, gamma = fib.gamma, RW = RW)
+                    return dBdz_raman(z, B, D = D_w, w = 2*np.pi*sim.freq, gamma = fib.gamma, gamma1 = fib.gamma1, RW = RW)
                 dBdz_with_progress.prev_z = 0
             else:
                 def dBdz_with_progress(z, B):
