@@ -20,7 +20,7 @@ def dBdz(z,B,D,w,gamma,window):
     A_w = B * np.exp(D*z)
     A_t = IFT(A_w)
     A_t[0:window] = A_t[window+1]
-    A_t[-window:-1] = A_t[-window-1]
+    A_t[-window:] = A_t[-window-1]
     if gamma:
         op_nolin = FT( 1j * gamma * Pot(A_t) * A_t)
     return np.exp(-D*z) * op_nolin
@@ -93,5 +93,5 @@ def Solve_dark(sim: Sim, fib: Fibra, pulso_0, window=0, z_locs=None, pbar=True):
         A_w[j,:] = A_w[j,:] * np.exp(D_w * zlocs[j])
     A_t = np.array([IFT(a_w) for a_w in A_w], dtype=complex)
 
-    return zlocs, A_w, A_t, ysol #Nos devuelve: zlocs = Posiciones donde calculamos la solución, A_w = Matriz con la evolución del espectro, A_t = Matriz con la evolución del pulso
+    return zlocs, A_w, A_t #Nos devuelve: zlocs = Posiciones donde calculamos la solución, A_w = Matriz con la evolución del espectro, A_t = Matriz con la evolución del pulso
 
