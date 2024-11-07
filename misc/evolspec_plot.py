@@ -17,7 +17,7 @@ from functools import partial
 #Time
 import time
 
-AW, AT, sim, fibra = loader("soliton_gen/1470_2", resim = True)
+AW, AT, sim, fibra = loader("soliton_gen/sgm", resim = True)
 zlocs = np.linspace(0, 300, len(AT))
 
 
@@ -108,9 +108,9 @@ cbar_tick_size = 16
 tick_size      = 16
 m_label_size   = 16
 M_label_size   = 15
-cmap = "magma"
+cmap = "cmr.ember"
 
-Tlim = [-40,120]
+Tlim = [-40,40]
 Wlim_s = [-25,25]
 
 P_T = Pot(AT)
