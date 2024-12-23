@@ -205,7 +205,7 @@ def plotcmap(sim:Sim, fib:Fibra, zlocs, AT, AW, wavelength=False, dB=False,
         P_W = Pot(AW)
         wextent = [fftshift(sim.freq)[0], fftshift(sim.freq)[-1], zlocs[0], zlocs[-1]]
     
-    #Escala dB
+    #Escala dBI
     if dB:
         P_T = 10*np.log10(P_T) - np.max( 10*np.log10(P_T[0]) )
         P_W = 10*np.log10(P_W) - np.max( 10*np.log10(P_W[0]) )

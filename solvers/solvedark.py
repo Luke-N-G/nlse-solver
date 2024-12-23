@@ -19,8 +19,8 @@ A cada step restaura los bordes de simulación.
 def dBdz(z,B,D,w,gamma,window):
     A_w = B * np.exp(D*z)
     A_t = IFT(A_w)
-    A_t[0:window] = A_t[window+1]
-    A_t[-window:] = A_t[-window-1]
+    #A_t[0:window] = A_t[window+1]
+    #A_t[-window:] = A_t[-window-1]
     if gamma:
         op_nolin = FT( 1j * gamma * Pot(A_t) * A_t)
     return np.exp(-D*z) * op_nolin
