@@ -35,7 +35,8 @@ def TwoColor(fib:Fibra, sim:Sim, t0):
 def meta(T, t0, order, fib:Fibra):
     f1 = np.sqrt(6*fibra.betas[0]/np.abs(fibra.betas[2]))
     f2 = -f1    
-    nu = -1/2 + (1/4 + 4 * (fibra.beta2_w(f1)/fibra.beta2_w(f2)))**(1/2)
+    nu = -1/2 + (1/4 + 4 * np.abs( (fibra.gamma_w(f2) * fibra.beta2_w(f1))/(fibra.gamma_w(f1)*fibra.beta2_w(f2)) )  )**(1/2)
+    print(nu)
     if order == 0:
         phi = (1/np.cosh(T/t0))**nu
     if order == 1:
@@ -54,8 +55,8 @@ def meta_spectrum(AW, sim, zlocs):
 #%%Parámetros de fibra y simulación
 
 #Parametros para la simulación
-N = int(2**15) #puntos
-Tmax = 4      #ps
+N = int(2**14) #puntos
+Tmax = 2      #ps
 
 c = 299792458 * (1e9)/(1e12)
 
@@ -68,16 +69,19 @@ b2    = 1
 b3    = 0               
 b4    = -1*1e-6
 betas = [b2,b3,b4]
-gam   = 1e6                 
-gam1 = 0
+gam   = 1e6 #1.4e-3
+                 
+#lambda_znw = 1650
+w_znw = -420*2*np.pi#2*np.pi*c/lambda_znw
+gam1 = -gam/w_znw#-gam/(w_znw - omega0)*1
+
 alph  = 0                      
 TR    = 0                  
-fR    = 0.18  *1                 
-
+fR    = 0.18  *0                
 
 
 #Parámetros Molécula
-t0 = 8e-3#100e-3
+t0 = 8e-3
 f1 = -np.sqrt(6*np.abs(b2)/np.abs(b4))
 f2 = -f1
 
@@ -86,13 +90,15 @@ f2 = -f1
 sim    = Sim(N, Tmax)
 fibra  = Fibra(L=L, beta2=b2, beta3=b3, gamma=gam, gamma1=gam1, betas=betas, alpha=alph, lambda0=Lambda0, TR = TR, fR = fR)
 z0 = np.abs( np.pi/2 * t0**2/fibra.beta2_w(f1) )
-L = 1.5*50*z0
+L = 50*z0
 fibra  = Fibra(L=L, beta2=b2, beta3=b3, gamma=gam, gamma1=gam1, betas=betas, alpha=alph, lambda0=Lambda0, TR = TR, fR = fR)
 
 
 #%% Armando los pulsos
 
-soliton = Soliton(sim.tiempo, t0, fibra.beta2_w(f1), fibra.gamma, orden=1)*np.exp(-1j*f1*sim.tiempo)
+soliton = Soliton(sim.tiempo, t0, fibra.beta2_w(f1), fibra.gamma_w(f1), orden=1)*np.exp(-1j*f1*sim.tiempo)
+
+soliton = Soliton(sim.tiempo, t0, fibra.beta2, fibra.gamma, orden=1)
 
 meta_0 = np.sqrt(1e-7) * np.max(soliton) * meta(sim.tiempo, t0, 0, fibra)*np.exp(-1j*f2*sim.tiempo)
 
@@ -104,14 +110,15 @@ molecule = TwoColor(fibra, sim, t0)
 
 CW = 1/5000*np.ones(len(soliton))*np.exp(-1j*(f1+2*np.pi*13.2)*sim.tiempo)
 
-pulse = molecule#soliton + meta_s
+pulse = soliton+meta_0*0#molecule
 
 
 #%% Corriendo el código
 
 #---NLSE molecule---
 time_0 = time.time()
-zlocs, AW, AT = SolveNLS(sim, fibra, pulse, z_locs=300, raman=True, pbar=True)
+#zlocs, AW, AT = SolveNLS(sim, fibra, pulse, z_locs=300, raman=True, pbar=True)
+zlocs, AW, AT = Solve_pcGNLSE(sim, fibra, pulse, z_locs=300, pbar=True)
 time_1 = time.time()
 
 total_n = time_1 - time_0 #Implementar en Solve_pcGNLSE
@@ -120,12 +127,21 @@ chime.success()
 
 AT_cut, AW_cut = meta_spectrum(AW, sim, zlocs)
 
-#%% Plots
+ #%% Plots
 
 plotcmap(sim, fibra, zlocs/z0, AT, AW, dB=True, vlims=[-40,0,-90,0], Tlim=[-1,2], Wlim=[-550,550])
 
-plotcmap(sim, fibra, zlocs/z0, AT_cut, AW_cut, dB=True, vlims=[-20,0,-30,0], Tlim=[-1,2], Wlim=[200,600])
+plotcmap(sim, fibra, zlocs/z0, AT, AW, dB=False, Tlim=[-1,2], Wlim=[-550,550])
 
+#plotcmap(sim, fibra, zlocs/z0, AT_cut, AW_cut, dB=True, vlims=[-20,0,-30,0], Tlim=[-1,2], Wlim=[200,600])
+
+#%% Saving
+
+dic  = "molecule_tests/"
+file = "phi0"
+
+#Saving data
+saver(AW, AT, sim, fibra, dic+file)
 
 
 #%%
