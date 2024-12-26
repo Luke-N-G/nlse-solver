@@ -256,7 +256,7 @@ cbar = fig.colorbar(im1, ax=[ax1, ax2], label='dB', location="top", aspect=30, p
 cbar.set_label('dB', size=m_label_size, labelpad=10)
 cbar.ax.tick_params(labelsize=cbar_tick_size)
 
-#plt.savefig("evolspec2.svg")
+#plt.savefig("evolspec_flip.svg")
 plt.show()
 
 #%% FLIPPED: ZNW case
@@ -342,5 +342,5 @@ cbar = fig.colorbar(im1, ax=[ax1, ax2], label='dB', location="top", aspect=30, p
 cbar.set_label('dB', size=m_label_size, labelpad=10)
 cbar.ax.tick_params(labelsize=cbar_tick_size)
 
-#plt.savefig("evolspec2.svg")
+#plt.savefig("ZNW_flipped.svg")
 plt.show()
