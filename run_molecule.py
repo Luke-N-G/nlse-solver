@@ -98,7 +98,7 @@ fibra  = Fibra(L=L, beta2=b2, beta3=b3, gamma=gam, gamma1=gam1, betas=betas, alp
 
 soliton = Soliton(sim.tiempo, t0, fibra.beta2_w(f1), fibra.gamma_w(f1), orden=1)*np.exp(-1j*f1*sim.tiempo)
 
-soliton = Soliton(sim.tiempo, t0, fibra.beta2, fibra.gamma, orden=1)
+#soliton = Soliton(sim.tiempo, t0, fibra.beta2, fibra.gamma, orden=1)
 
 meta_0 = np.sqrt(1e-7) * np.max(soliton) * meta(sim.tiempo, t0, 0, fibra)*np.exp(-1j*f2*sim.tiempo)
 
@@ -110,7 +110,7 @@ molecule = TwoColor(fibra, sim, t0)
 
 CW = 1/5000*np.ones(len(soliton))*np.exp(-1j*(f1+2*np.pi*13.2)*sim.tiempo)
 
-pulse = soliton+meta_0*0#molecule
+pulse = molecule#soliton+meta_0*0#molecule
 
 
 #%% Corriendo el código
